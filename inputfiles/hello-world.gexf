@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gexf xmlns="http://www.gexf.net/1.2draft" xmlns:viz="http://www.gexf.net/1.2draft/viz" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.gexf.net/1.2draft http://www.gexf.net/1.2draft/gexf.xsd" version="1.2">
+    <meta lastmodifieddate="2009-03-20">
+        <creator>Gephi.org</creator>
+        <description>A hello world! file</description>
+    </meta>
+    <graph mode="static" defaultedgetype="directed">
+        <nodes>
+            <node id="S0" label="a"/>
+            <node id="1" label="b"/>
+            <node id="2" label="a,b"/>
+        </nodes>
+        <edges>
+            <edge id="S0" source="1" target="1"/>
+            <edge id="1" source="2" target="S0"/>
+            <edge id="2" source="2" target="1"/>
+            <edge id="2" source="S0" target="1"/>
+        </edges>
+    </graph>
+</gexf>
