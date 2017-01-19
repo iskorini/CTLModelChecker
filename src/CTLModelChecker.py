@@ -22,10 +22,12 @@ class CTLModelChecker:
         listTemp = []
         if op == '!':
             elements = self.checkFormula()
-            for e in elements:
-                if e not in self.__nodes[e]:
-                    self.__satisfactionSet.append(e)
-                    listTemp.append(e)
+            print elements
+            for node in self.__nodes:
+                if node not in elements:
+                    self.__satisfactionSet.append(node)
+                    listTemp.append(node)
+            print listTemp
             return listTemp
         elif op == '&':
             elements0 = self.checkFormula()
