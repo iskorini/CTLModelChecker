@@ -44,55 +44,28 @@ def BNF():
     """
     global bnf
     if not bnf:
-        point = Literal( "." )
 
         atomicVal = Word(alphas)
-        fnumber = Combine( Word( "+-"+nums, nums ))
 
-        plus  = Literal( "+" )
-        minus = Literal( "-" )
-        mult  = Literal( "*" )
-        div   = Literal( "/" )
         lpar  = Literal( "(" ).suppress()
         rpar  = Literal( ")" ).suppress()
-        addop  = plus | minus
-        multop = mult | div
-        expop = Literal( "^" )
+
         notOp = Literal( "!")
         andOp = Literal( "&" )
-        untilOp = CaselessLiteral( "U" )
-        pi    = CaselessLiteral( "PI" )
+        untilOp = Literal( "#" )
 
         expr = Forward()
-        atom0 = (Optional("@") + (atomicVal | atomicVal + lpar + expr + rpar ).setParseAction( pushFirst ) | ( lpar + expr.suppress() + rpar )).setParseAction(pushUAlways)
-        atom1 = (Optional("!") + (atomicVal | atomicVal + lpar + expr + rpar ).setParseAction( pushFirst ) | ( lpar + expr.suppress() + rpar )).setParseAction(pushUNot)
+        atom0 = (Optional("@") + (atomicVal | lpar + atomicVal  + rpar ).setParseAction( pushFirst ) | Optional("@") + ( lpar + expr + rpar )).setParseAction(pushUAlways)
+        atom1 = (Optional("!") + (atomicVal | lpar + atomicVal  + rpar ).setParseAction( pushFirst ) | Optional("!") + ( lpar + expr + rpar )).setParseAction(pushUNot)
 
-        factor0 = Forward()
-        factor0 = atom0 + ZeroOrMore( ( notOp + andOp + untilOp + factor0 ).setParseAction( pushFirst ) )
-        factor1 = Forward()
-        factor1 = atom1 + ZeroOrMore( ( notOp + andOp + untilOp + factor1 ).setParseAction( pushFirst ) )
+        factor = Forward()
+        factor = (atom1|atom0) + ZeroOrMore( ( andOp + (atom1|atom0) | untilOp +(atom1|atom0)  ).setParseAction( pushFirst ) )
 
-        term0 = factor1 + ZeroOrMore( ( andOp   + factor1  ).setParseAction( pushFirst ) )
-        term1 = term0 + ZeroOrMore( ( untilOp + factor1 ).setParseAction( pushFirst ) )
-        expr << term1
+        expr << factor
 
         bnf = expr
     return bnf
 
-# map operator symbols to corresponding arithmetic operations
-epsilon = 1e-12
-opn = { "+" : operator.add,
-        "-" : operator.sub,
-        "*" : operator.mul,
-        "/" : operator.truediv,
-        "^" : operator.pow }
-fn  = { "sin" : math.sin,
-        "cos" : math.cos,
-        "tan" : math.tan,
-        "abs" : abs,
-        "trunc" : lambda a: int(a),
-        "round" : round,
-        "sgn" : lambda a: abs(a)>epsilon and cmp(a,0) or 0}
 def evaluateStack( s ):
     op = s.pop()
     if op == 'unary @':
@@ -101,19 +74,11 @@ def evaluateStack( s ):
         op1 = "!"+evaluateStack( s )
         print op1
         return op1
-    if op in "+-*/^":
-        op2 = evaluateStack( s )
-        op1 = evaluateStack( s )
-        return opn[op]( op1, op2 )
-    if op in "&U":
+    if op in "&#":
         op1 = evaluateStack( s )
         op2 = evaluateStack( s )
-        print op1 + " "+op+" "+ op2
-        return op1+op2
-    elif op == "PI":
-        return math.pi # 3.1415926535
-    elif op in fn:
-        return fn[op]( evaluateStack( s ) )
+        print op2 + " "+op+" "+ op1
+        return op2+op1
     elif op[0].isalpha():
         return op[0]
     else:
@@ -125,18 +90,24 @@ if __name__ == "__main__":
         global exprStack
         exprStack = []
         results = BNF().parseString( s )
+        print "### stringa di test ###"
         print s
+        print "### stack  generato ###"
         print exprStack
         val = evaluateStack( exprStack[:] )
-        # if val == expVal:
-        #     print s, "=", val, results, "=>", exprStack
-        # else:
-        #     print s+"!!!", val, "!=", expVal, results, "=>", exprStack
 
+    test("a")
     test( "a & b")
-    test( "(a & b) U (c & (d & e))")
+    print ""
+    test( "(a & b) # (c & (d & e))")
+    print ""
+    test( "(a & b) # (c # (d # e))")
+    print ""
     test ("!a")
-    test ("@a")
+    print ""
+    test ("@(a)")
+    print ""
 
     test ( "@a & !b")
+    print ""
     test ( "!(a & b)")
