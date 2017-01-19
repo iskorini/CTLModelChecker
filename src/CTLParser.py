@@ -19,7 +19,7 @@ class CTLParser:
         if toks and toks[0]=='!':
             self.exprStack.append( '!' )
     def pushUAlways(self, strg, loc, toks ):
-        print toks
+        print (toks)
         if toks and toks[0]=="[]":
             self.exprStack.append( '[]' )
     def pushNext(self, strg, loc, toks):
@@ -38,8 +38,8 @@ class CTLParser:
             untilOp = Literal( "#" )
             expr = Forward()
             atom0 = (Optional("[]") + (atomicVal | lpar + atomicVal  + rpar ).setParseAction( self.pushFirst ) | Optional("[]") + ( lpar + expr + rpar )).setParseAction(self.pushUAlways)
-            atom1 = (Optional("!") + (atomicVal | lpar + atomicVal  + rpar ).setParseAction( self.pushFirst ) | Optional("!") + ( lpar + expr + rpar )).setParseAction(self.pushUNot)
-            atom2 = (Optional("><") + (atomicVal | lpar + atomicVal + rpar).setParseAction(self.pushFirst) | Optional("><") + (lpar + expr + rpar)).setParseAction(self.pushNext)
+            atom1 = (Optional("!")  + (atomicVal | lpar + atomicVal  + rpar ).setParseAction( self.pushFirst ) | Optional("!")  + ( lpar + expr + rpar )).setParseAction(self.pushUNot)
+            atom2 = (Optional("><") + (atomicVal | lpar + atomicVal  + rpar ).setParseAction( self.pushFirst)  | Optional("><") + ( lpar + expr + rpar )).setParseAction(self.pushNext)
             factor = Forward()
             factor = (atom1|atom0|atom2) + ZeroOrMore( ( andOp + (atom1|atom0|atom2) | untilOp +(atom1|atom0|atom2)  ).setParseAction( self.pushFirst ) )
             expr << factor
