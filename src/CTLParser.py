@@ -66,6 +66,9 @@ class CTLParser:
         else:
             return float( op )
 
+    def getStack(self):
+        return self.exprStack
+
 
 
 
@@ -79,13 +82,14 @@ if __name__ == "__main__":
         print s
         print "### stack  generato ###"
         print parser.exprStack
-        val = parser.evaluateStack()
+        #val = parser.evaluateStack()
 
 
 
 
     #test("((a & b) # c) & (>< (d & e))")
-    test("><(a) & (b # [](!c))")
+    #test("><(a) & (b # [](!c))")
+    test("!(a & b) & k")
     #test("a")
     #test( "a & b")
     #print ""
