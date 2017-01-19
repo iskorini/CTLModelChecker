@@ -22,26 +22,19 @@ class CTLModelChecker:
         listTemp = []
         if op == '!':
             elements = self.checkFormula()
-            print elements
             for node in self.__nodes:
                 if node not in elements:
-                    self.__satisfactionSet.append(node)
                     listTemp.append(node)
-            print listTemp
             return listTemp
         elif op == '&':
             elements0 = self.checkFormula()
             elements1 = self.checkFormula()
             for e in elements0:
                 if e in elements1:
-                    self.__satisfactionSet.append(e)
                     listTemp.append(e)
             return listTemp
         elif op[0].isalpha():
             for node in self.__nodes:
                 if op in self.__nodes[node]:
-                    self.__satisfactionSet.append(node)
                     listTemp.append(node)
-            # print "singoletto " + op
-            # print listTemp
             return listTemp
