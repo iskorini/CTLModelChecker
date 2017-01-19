@@ -53,10 +53,20 @@ class CTLModelChecker:
                 el0 = satisfactionSet.pop()
                 el1 = satisfactionSet.pop()
                 satisfactionSet.append(self.__checkUntil(el0, el1))
+            elif i == '><':
+                el0 = satisfactionSet.pop()
+                satisfactionSet.append(self.__checkNext(el0))
             elif i[0].isalpha():
                 satisfactionSet.append(self.__checkSingle(i))
 
         return satisfactionSet
+
+    def __checkNext(self, el0):
+        tempList = []
+        for node in self.__nodes:
+            successors = nx.successors(node)
+            if len(set(successors).intersection(set(el0))) > 0:
+                tempList.append(node)
 
     def __checkUntil(self, el0, el1):
         E = el1
