@@ -15,4 +15,4 @@ if __name__ == "__main__":
     modelChecker = CTLModelChecker(path, 'a & !b')
     print "Start check"
     print "Elementi soddisfatti "
-    print modelChecker.checkFormula()
+    print modelChecker.iterativeCheckFormula()

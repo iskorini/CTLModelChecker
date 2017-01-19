@@ -38,3 +38,51 @@ class CTLModelChecker:
                 if op in self.__nodes[node]:
                     listTemp.append(node)
             return listTemp
+
+    def iterativeCheckFormula(self):
+        satisfactionSet = []
+        for i in self.__formula:
+            if i == '!':
+                el0 = satisfactionSet.pop()
+                satisfactionSet.append(self.__checkNot(el0))
+            elif i == '&':
+                el0 = satisfactionSet.pop()
+                el1 = satisfactionSet.pop()
+                satisfactionSet.append(self.__checkAnd(el0, el1))
+            elif i == '#':
+                el0 = satisfactionSet.pop()
+                el1 = satisfactionSet.pop()
+                satisfactionSet.append(self.__checkUntil(el0, el1))
+            elif i[0].isalpha():
+                satisfactionSet.append(self.__checkSingle(i))
+
+        return satisfactionSet
+
+    def __checkUntil(self, el0, el1):
+        E = el1
+        T = E
+        while len(E) > 0:
+            s1 = E.pop()
+            s1Preset = nx.predecessor(self.__ts, s1)
+            for s in s1Preset:
+                if s in list(set(el0)-set(T)):
+                    E.append(s)
+                    T.append(s)
+        return T
+
+    def __checkSingle(self, i):
+        tempList = []
+        for node in self.__nodes:
+            if i in self.__nodes[node]:
+                tempList.append(node)
+        return tempList
+
+    def __checkAnd(self, el0, el1):
+        return list(set(el0).intersection(el1))
+
+    def __checkNot(self, el0):
+        tempList = []
+        for node in self.__nodes:
+            if node not in el0:
+                tempList.append(node)
+        return tempList
