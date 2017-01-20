@@ -12,7 +12,7 @@ if __name__ == "__main__":
     #nx.draw(graph)
     #plt.show()
     #nx.write_gexf("output.gexf")
-    modelChecker = CTLModelChecker(path, 'a & !b')
+    modelChecker = CTLModelChecker(path, '[]b')
     print "Start check"
     print "Elementi soddisfatti "
     print modelChecker.iterativeCheckFormula()

@@ -56,15 +56,41 @@ class CTLModelChecker:
             elif i == '><':
                 el0 = satisfactionSet.pop()
                 satisfactionSet.append(self.__checkNext(el0))
+            elif i == '[]':
+                el0 = satisfactionSet.pop()
+                satisfactionSet.append(self.__checkAlways(el0))
             elif i[0].isalpha():
                 satisfactionSet.append(self.__checkSingle(i))
 
-        return satisfactionSet
+        return (self.__checkInitialStates() in satisfactionSet, satisfactionSet)
+
+
+    def __checkAlways(self, el0):
+        E = list(set(self.__nodes)-set(el0))
+        T = el0
+        count = dict()
+        for el in el0: #cambiare con map
+            count[el] = len(self.__ts.successors(el))
+        while len(E) > 0:
+            s1 = E.pop()
+            s1Preset = self.__ts.predecessors(s1)
+            for s1pre in s1Preset:
+                if s1pre in T:
+                    count[s1pre] = count[s1pre]-1
+                    if count[s1pre] == 0:
+                        E.append(s1pre)
+                        T.remove(s1pre)
+
+        return T
+
+    def __checkInitialStates(self):
+        return filter(lambda x: 'S' in x, self.__nodes)
+
 
     def __checkNext(self, el0):
         tempList = []
         for node in self.__nodes:
-            successors = nx.successors(node)
+            successors = self.__ts.successors(node)
             if len(set(successors).intersection(set(el0))) > 0:
                 tempList.append(node)
 
@@ -73,7 +99,7 @@ class CTLModelChecker:
         T = E
         while len(E) > 0:
             s1 = E.pop()
-            s1Preset = nx.predecessor(self.__ts, s1)
+            s1Preset = self.__ts.predecessor(s1)
             for s in s1Preset:
                 if s in list(set(el0)-set(T)):
                     E.append(s)
@@ -90,7 +116,7 @@ class CTLModelChecker:
     def __checkAnd(self, el0, el1):
         return list(set(el0).intersection(el1))
 
-    def __checkNot(self, el0):
+    def __checkNot(self, el0): #cambiare con set
         tempList = []
         for node in self.__nodes:
             if node not in el0:
