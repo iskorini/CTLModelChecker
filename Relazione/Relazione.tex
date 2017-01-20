@@ -1,0 +1,80 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[italian]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage[makeroom]{cancel}
+\usepackage{mathtools}
+\usepackage{hyperref}
+\usepackage[]{acronym}
+
+\title{Relazione per l'approfondimento su Computational Tree Logic}
+\author{Filippo Mameli, Federico Schipani}
+\makeindex
+
+
+\newtheorem{prop}{Proprietà}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\section{Introduzione a \ac*{CTL}}
+\ac*{CTL} è una logica proposta da Clarke e Emerson per far fronte ad alcuni problemi noti di \ac{LTL}. In \ac{LTL} il concetto di tempo è lineare, ciò vuol dire che in un determinato momento abbiamo un unico possibile futuro. Ciò comporta che una determinata formula $\phi$ è valida in uno stato $s$, se e solo se tutte le possibili computazioni che partono da quello stato soddisfano la formula. Più formalmente:
+\begin{equation}\label{first}
+    s \vdash \phi \iff \pi \vdash \phi \ \forall \  paths \  \pi \ che\  inizia\  in\  s
+\end{equation}
+Come si può notare dalla Formula \eqref{first} non è possibile imporre facilmente condizioni di soddisfacibilità solo su alcuni di questi path. Dato uno stato $s$, verificare che solo alcune computazioni soddisfano una formula $\phi$ può essere fatto usando la dualità tra l'operatore universale ed esistenziale. Quindi verificare  $ s \vdash  \exists \phi $ corrisponde a verificare $s \vdash \forall \neg \phi $. Se quest'ultima non è soddisfatta allora esisterà una computazione che soddisferà $\phi$, altrimenti non esisterà. \par
+Questo sotterfugio non è possibile usarlo per proprietà più complicate. Per esempio la proprietà
+\begin{prop}
+\label{prop:first}
+Per ogni computazione è sempre possibile ritornare in uno stato iniziale 
+\end{prop}
+non è possibile esprimerla in \ac{LTL}. Un tentativo potrebbe essere $\square\lozenge start$, dove $start$ indica uno stato iniziale. Tuttavia una formula di questo tipo è troppo forte, in quanto questa formula impone che una computazione ritorni sempre in uno stato iniziale, e non soltanto eventualmente. \par
+\ac{CTL} risolve questi problemi introducendo una nozione di tempo che si basa sulle diramazioni. Quindi non abbiamo più un infinita sequenza di stati, ma un infinito albero di stati. Questo comporta che in un determinato momento avremo diversi possibili futuri.\par
+La semantica di questa logica è definita in termini di infiniti alberi, dove ogni diramazione rappresenta un singolo percorso. L'albero quindi è una fedele rappresentazione di tutti i possibili path, e si può facilmente ottenere schiudendo il \ac{TS}.\par
+In \ac{CTL} sono presenti quantificatori, definiti sui path, di tipo esistenziale ($\exists$) ed universale ($\forall$). La Proprietà $\exists\lozenge \psi$ dice che esiste una computazione che soddisfa $\lozenge\psi$, più intuitivamente vuol dire che esisterà almeno una possibile computazione nel quale uno stato $s$ che soddisfa $\psi$ verrà eventualmente raggiunto. Tuttavia questo non esclude la possibilità che ci possono essere computazioni per le quali questa proprietà non viene soddisfatta.
+La proprietà \ref{prop:first} citata in precedenza è possibile ottenerla annidando quantificatori esistenziali ed universali in questo modo:
+\begin{equation}
+\label{second}
+\forall\square\exists\lozenge start
+\end{equation}
+La Formula \eqref{second} si legge come: in ogni stato ($\square$) di ogni possibile computazione ($\forall$), è possibile ($\exists$) eventualmente ritornare in uno stato iniziale ($\lozenge start$).
+
+
+\subsection{Sintassi di \ac{CTL}} 
+
+
+\begin{acronym}
+\acro{CTL}{Computational Tree Logic}
+\acro{LTL}{Linear Temporal Logic}
+\acro{TS}{Transition System}
+\end{acronym}
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
