@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 from CTLModelChecker import CTLModelChecker
+from ENFConverter import ENFConverter
 if __name__ == "__main__":
     path = '../inputfiles/hello-world.gexf'
     #graph = nx.read_gexf('/Users/federicoschipani/Desktop/UNI - Magistrale/MFVS - Metodi Formali Per la Verifica di Sistemi/Progetto/CTLModelChecker/inputfiles/hello-world.gexf',  node_type=None, relabel=False, version='1.1draft')
@@ -12,7 +13,9 @@ if __name__ == "__main__":
     #nx.draw(graph)
     #plt.show()
     #nx.write_gexf("output.gexf")
-    modelChecker = CTLModelChecker(path, '[]b')
+    converter = ENFConverter()
+    converter.convert("a FU (b & c)")
+    modelChecker = CTLModelChecker(path, 'TRUE & b')
     print "Start check"
     print "Elementi soddisfatti "
     print modelChecker.iterativeCheckFormula()

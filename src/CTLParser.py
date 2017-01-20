@@ -23,18 +23,26 @@ class CTLParser:
     def CTL(self):
         global bnf
         if not bnf:
-            atomicVal = Word("abcdefghijklmnopqrstuvwxyz") | "TRUE"
-            lpar  = Literal( "(" ).suppress()
-            rpar  = Literal( ")" ).suppress()
-            notOp = Literal( "!")
-            andOp = Literal( "&" )
-            untilOp = Literal( "UNTIL" )
+            atomicVal       = Word("abcdefghijklmnopqrstuvwxyz") | "TRUE"
+            lpar            = Literal( "(" ).suppress()
+            rpar            = Literal( ")" ).suppress()
+            notOp           = Literal( "!")
+            andOp           = Literal( "&" )
+            untilOp         = Literal( "UNTIL" )
+            forAllEventualy = Literal( "FE" )
+            existsEventualy = Literal( "EE" )
+            forAllAlways    = Literal("FA")
+            forAllNext      = Literal("FN")
+            forAllUntil     = Literal("FU")
             expr = Forward()
-            atom0 = (Optional("[]") + (atomicVal | lpar + atomicVal  + rpar ).setParseAction( self.pushFirst ) | Optional("[]") + ( lpar + expr + rpar )).setParseAction(self.pushUAlways)
-            atom1 = (Optional("!")  + (atomicVal | lpar + atomicVal  + rpar ).setParseAction( self.pushFirst ) | Optional("!")  + ( lpar + expr + rpar )).setParseAction(self.pushUNot)
-            atom2 = (Optional("NEXT") + (atomicVal | lpar + atomicVal  + rpar ).setParseAction( self.pushFirst)  | Optional("NEXT") + ( lpar + expr + rpar )).setParseAction(self.pushNext)
+            atom0 = (Optional("[]")     + (atomicVal | lpar + atomicVal  + rpar ).setParseAction( self.pushFirst ) | Optional("[]")   + ( lpar + expr + rpar )).setParseAction(self.pushUAlways)
+            atom1 = (Optional("!")      + (atomicVal | lpar + atomicVal  + rpar ).setParseAction( self.pushFirst ) | Optional("!")    + ( lpar + expr + rpar )).setParseAction(self.pushUNot)
+            atom2 = (Optional("NEXT")   + (atomicVal | lpar + atomicVal  + rpar ).setParseAction( self.pushFirst ) | Optional("NEXT") + ( lpar + expr + rpar )).setParseAction(self.pushNext)
+
+            atoms = atom0|atom1|atom2
+
             factor = Forward()
-            factor = (atom1|atom0|atom2) + ZeroOrMore( ( andOp + (atom1|atom0|atom2) | untilOp +(atom1|atom0|atom2)  ).setParseAction( self.pushFirst ) )
+            factor = (atoms) + ZeroOrMore( ( andOp + (atoms) | untilOp +(atoms)  ).setParseAction( self.pushFirst ) )
             expr << factor
             bnf = expr
         return bnf
@@ -59,8 +67,6 @@ class CTLParser:
             op2 = self.evaluateStack()
             print op2 + " "+op+" "+ op1
             return op2+op1
-        if op in "NEXT":
-            return "NEXT"+self.evaluateStack()
         if op == "TRUE":
             return "TRUE"
         if op == "TRUE":
@@ -68,14 +74,10 @@ class CTLParser:
         if op in "abcdefghijklmnopqrstuvwxyz":
             return op
         else:
-            return op+":"+self.evaluateStack()
+            return op+" "+self.evaluateStack()
 
     def getStack(self):
         return self.exprStack
-
-
-
-
 
 if __name__ == "__main__":
 

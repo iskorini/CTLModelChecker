@@ -1,6 +1,6 @@
 from pyparsing import Literal,CaselessLiteral,Word,Combine,Group,Optional,\
     ZeroOrMore,Forward,nums,alphas
-class ENF:
+class ENFConverter:
 
     global bnf
 
@@ -43,9 +43,9 @@ class ENF:
             untilOp         = Literal( "UNTIL" )
             forAllEventualy = Literal( "FE" )
             existsEventualy = Literal( "EE" )
-            forAllAlways    = Literal("FA")
-            forAllNext      = Literal("FN")
-            forAllUntil     = Literal("FU")
+            forAllAlways    = Literal( "FA")
+            forAllNext      = Literal( "FN")
+            forAllUntil     = Literal( "FU")
             expr = Forward()
             atom0 = (Optional("[]")     + (atomicVal | lpar + atomicVal  + rpar ).setParseAction( self.pushFirst ) | Optional("[]")   + ( lpar + expr + rpar )).setParseAction(self.pushUAlways)
             atom1 = (Optional("!")      + (atomicVal | lpar + atomicVal  + rpar ).setParseAction( self.pushFirst ) | Optional("!")    + ( lpar + expr + rpar )).setParseAction(self.pushUNot)
@@ -76,26 +76,47 @@ class ENF:
             op1 = self.evaluateStack()
             op2 = self.evaluateStack()
             print op2 + " "+op+" "+ op1
-            return op2+op1
+            return op2 + " "+op+" "+ op1
         if op == "UNTIL":
             op1 = self.evaluateStack()
             op2 = self.evaluateStack()
             print op2 + " "+op+" "+ op1
             return op2 + " "+op+" "+ op1
+        if op == "FN":
+            op1 = "!(NEXT(!(" +self.evaluateStack()+")))"
+            print op1
+            return op1
+        if op == "FE":
+            op1 = "!([](!(" +self.evaluateStack()+")))"
+            print op1
+            return op1
         if op == "FU":
-            op1 = self.evaluateStack()
-            op2 = self.evaluateStack()
-            print op2 + " "+op+" "+ op1
-            return op2 + " "+op+" "+ op1
+            op1 = self.evaluateStack() #phi
+            op2 = self.evaluateStack() #psi
+            op3 = "!(!("+op2+")UNTIL(!("+op1+")&!("+op2+"))) & !([](!("+op2+")))"
+            print op3
+            return op3
+        if op == "FA":
+            op1 = "!(TRUE UNTIL !(" + self.evaluateStack() + "))"
+            print op1
+            return op1
+        if op == "EE":
+            op1 = "TRUE UNTIL (" + self.evaluateStack() + ")"
+            print op1
+            return op1
         if op == "TRUE":
             return "TRUE"
         if op in "abcdefghijklmnopqrstuvwxyz":
             return op
         else:
-            return op+":"+self.evaluateStack()
+            return op+" "+self.evaluateStack()
 
     def getStack(self):
         return self.exprStack
+
+    def convert(self, s):
+        self.ENF().parseString(s)
+        return self.evaluateStack()
 
 if __name__ == "__main__":
 
@@ -109,7 +130,9 @@ if __name__ == "__main__":
         val = parser.evaluateStack()
 
 
-
-
+    test ("(NEXT a) FU b")
+    test ("FA (a & b)")
+    test ("EE (a & b)")
+    # test("FN(a & b) & FE(c UNTIL d)")
     #test("((a & b) # c) & (>< (d & e))")
-    test("FE(TRUE) & (b FU NEXT(!c))")
+    # test("FE(TRUE) & (b FU NEXT(!c))")

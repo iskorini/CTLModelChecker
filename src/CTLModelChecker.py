@@ -14,7 +14,7 @@ class CTLModelChecker:
         print self.__nodes
         parser = CTLParser()
         parser.CTL().parseString(formula)
-        self.__formula = parser.exprStack
+        self.__formula = parser.getStack()
         print formula
 
     def checkFormula(self):
@@ -49,20 +49,22 @@ class CTLModelChecker:
                 el0 = satisfactionSet.pop()
                 el1 = satisfactionSet.pop()
                 satisfactionSet.append(self.__checkAnd(el0, el1))
-            elif i == '#':
+            elif i == 'UNTIL':
                 el0 = satisfactionSet.pop()
                 el1 = satisfactionSet.pop()
                 satisfactionSet.append(self.__checkUntil(el0, el1))
-            elif i == '><':
+            elif i == 'NEXT':
                 el0 = satisfactionSet.pop()
                 satisfactionSet.append(self.__checkNext(el0))
             elif i == '[]':
                 el0 = satisfactionSet.pop()
                 satisfactionSet.append(self.__checkAlways(el0))
+            elif i == 'TRUE':
+                satisfactionSet.append(self.__checkTrue())
             elif i[0].isalpha():
                 satisfactionSet.append(self.__checkSingle(i))
 
-        return (self.__checkInitialStates() in satisfactionSet, satisfactionSet)
+        return (self.__checkInitialStates(satisfactionSet), satisfactionSet)
 
 
     def __checkAlways(self, el0):
@@ -83,8 +85,12 @@ class CTLModelChecker:
 
         return T
 
-    def __checkInitialStates(self):
-        return filter(lambda x: 'S' in x, self.__nodes)
+    def __checkInitialStates(self,satSet):
+        initialStates = filter(lambda x: 'S' in x, self.__nodes)
+        for state in initialStates:
+            if state not in satSet[0]:
+                return False
+        return True
 
 
     def __checkNext(self, el0):
@@ -106,6 +112,9 @@ class CTLModelChecker:
                     T.append(s)
         return T
 
+    def __checkTrue(self):
+        return self.__nodes
+
     def __checkSingle(self, i):
         tempList = []
         for node in self.__nodes:
@@ -117,8 +126,8 @@ class CTLModelChecker:
         return list(set(el0).intersection(el1))
 
     def __checkNot(self, el0): #cambiare con set
-        tempList = []
-        for node in self.__nodes:
-            if node not in el0:
-                tempList.append(node)
-        return tempList
+        # tempList = []
+        # for node in self.__nodes:
+        #     if node not in el0:
+        #         tempList.append(node)
+        return list(set(self.__nodes) - set(el0))
