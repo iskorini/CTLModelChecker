@@ -64,7 +64,7 @@ class CTLModelChecker:
             elif i[0].isalpha():
                 satisfactionSet.append(self.__checkSingle(i))
 
-        return (self.__checkInitialStates(satisfactionSet), satisfactionSet)
+        return (self.__checkInitialStates(satisfactionSet), satisfactionSet[0])
 
 
     def __checkAlways(self, el0):
