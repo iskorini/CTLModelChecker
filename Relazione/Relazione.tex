@@ -9,23 +9,39 @@
 \usepackage{mathtools}
 \usepackage{hyperref}
 \usepackage[]{acronym}
-
+\usepackage{syntax}
+\usepackage{newfloat}
+\usepackage{float}
+%\usepackage[LGRgreek]{mathastext}
+\usepackage[osf,sc]{mathpazo}
+\usepackage{eulervm}
+\usepackage{MnSymbol}
 \title{Relazione per l'approfondimento su Computational Tree Logic}
 \author{Filippo Mameli, Federico Schipani}
 \makeindex
 
+\let\syntleft\relax
+\let\syntright\relax
+\grammarparsep=30pt
+\DeclareFloatingEnvironment[
+  fileext   = logr,
+  listname  = {List of Grammars},
+  name      = Grammatica,
+  placement = H
+]{Grammar}
 
 \newtheorem{prop}{Proprietà}
+\newtheorem{defn}{Definizione}
 
 \begin{document}
 \maketitle
 \tableofcontents
 \section{Introduzione a \ac*{CTL}}
-\ac*{CTL} è una logica proposta da Clarke e Emerson per far fronte ad alcuni problemi noti di \ac{LTL}. In \ac{LTL} il concetto di tempo è lineare, ciò vuol dire che in un determinato momento abbiamo un unico possibile futuro. Ciò comporta che una determinata formula $\phi$ è valida in uno stato $s$, se e solo se tutte le possibili computazioni che partono da quello stato soddisfano la formula. Più formalmente:
+\acf{CTL} è una logica proposta da Clarke e Emerson per far fronte ad alcuni problemi noti di \ac{LTL}. In \ac{LTL} il concetto di tempo è lineare, ciò vuol dire che in un determinato momento abbiamo un unico possibile futuro. Ciò comporta che una determinata formula $\phi$ è valida in uno stato $s$, se e solo se tutte le possibili computazioni che partono da quello stato soddisfano la formula. Più formalmente:
 \begin{equation}\label{first}
-    s \vdash \phi \iff \pi \vdash \phi \ \forall \  paths \  \pi \ che\  inizia\  in\  s
+    s \models \phi \iff \pi \models \phi \ \forall \  paths \  \pi \ che\  inizia\  in\  s
 \end{equation}
-Come si può notare dalla Formula \eqref{first} non è possibile imporre facilmente condizioni di soddisfacibilità solo su alcuni di questi path. Dato uno stato $s$, verificare che solo alcune computazioni soddisfano una formula $\phi$ può essere fatto usando la dualità tra l'operatore universale ed esistenziale. Quindi verificare  $ s \vdash  \exists \phi $ corrisponde a verificare $s \vdash \forall \neg \phi $. Se quest'ultima non è soddisfatta allora esisterà una computazione che soddisferà $\phi$, altrimenti non esisterà. \par
+Come si può notare dalla Formula \eqref{first} non è possibile imporre facilmente condizioni di soddisfacibilità solo su alcuni di questi path. Dato uno stato $s$, verificare che solo alcune computazioni soddisfano una formula $\phi$ può essere fatto usando la dualità tra l'operatore universale ed esistenziale. Quindi verificare  $ s \models  \exists \phi $ corrisponde a verificare $s \models \forall \neg \phi $. Se quest'ultima non è soddisfatta allora esisterà una computazione che soddisferà $\phi$, altrimenti non esisterà. \par
 Questo sotterfugio non è possibile usarlo per proprietà più complicate. Per esempio la proprietà
 \begin{prop}
 \label{prop:first}
@@ -44,7 +60,51 @@ La Formula \eqref{second} si legge come: in ogni stato ($\square$) di ogni possi
 
 
 \subsection{Sintassi di \ac{CTL}} 
+\ac{CTL} ha una sintassi a due livelli, dove le formule sono classificate in \textit{formule sugli stati} e \textit{formule sui path}. 
 
+\begin{Grammar}
+	\begin{grammar}	
+	
+	\centering
+	<$\boldsymbol{\phi}$> ::= true | a | $\boldsymbol{\phi}_{1} \wedge \boldsymbol{\phi}_{2}$ | $\neg \boldsymbol{\phi}$ | $	\exists \varphi$ | $\forall \varphi$ 
+	
+	\end{grammar}
+	\caption{Grammatica per le formule sugli stati}\label{gra:stateformulae}
+\end{Grammar}
+Le prime sono definite dalla Grammatica \ref{gra:stateformulae} dove $a \in AP$ e $\varphi$ è una formula sui path.
+\begin{Grammar}
+	\begin{grammar}	
+	
+	\centering
+	<$\varphi$> ::= $\bigcircle \boldsymbol{\phi}$ | $\boldsymbol{\phi}_{1}\ \boldsymbol{U}\  \boldsymbol{\phi}_{2}$ 
+	
+	\end{grammar}
+	\caption{Grammatica per le formule sui path}\label{gra:pathformulae}
+\end{Grammar}
+Le \textit{formule sui path} sono invece definite dalla Grammatica \ref{gra:pathformulae}.
+Intuitivamente si può dire che le formule sugli stati esprimono una proprietà su uno stato, mentre le formule sui path esprimono proprietà sui infinite sequenze di stati. Per esempio la formula $\bigcircle \phi$ è vera per un path se lo stato successivo, in quel path, soddisfa $\phi$. Una formula sugli stati può essere trasformata in una formula sui path aggiungendo all'inizio un quantificatore esistenziale ($\exists$) o universale ($\forall$). Per esempio la formula $\exists \varphi$ è valida in uno stato se esiste almeno un percorso che soddisfa $\varphi$.
+
+\subsection{Semantica di \ac{CTL}}
+
+Le formule \ac{CTL} sono interpretate sia sugli stati che sui path di un \ac{TS}. Formalmente, dato un \ac{TS}, la semantica di una formula è definita da due relazioni di soddisfazione: una per le formule di stato ed una per le formule di path.
+Per le formule di stato è un tipo di relazione tra gli stati del \ac{TS} e la formula di stato. Si scrive che $s \models \boldsymbol{\phi}$ se e solo se la formula di stato $\boldsymbol{\phi}$ è vera nello stato $s$.\par
+Per le formule di path la relazione $\models$ è una relazione definita tra un frammento di path massimale nel \ac{TS} e una formula di path. Si scrive che $\pi \models \varphi$ se e solo se il path $\pi$ soddisfa la formula $\varphi$.
+\begin{defn}
+Sia $a \in AP$ una proposizione atomica, $TS = (S, act, \rightarrow, I, AP, L)$ un \acf{TS} senza stati terminali, stati $s \in S$, $\boldsymbol{\phi}$, $\boldsymbol{\Psi}$ formule \ac{CTL} di stato e $\varphi$ una formula \ac{CTL} di path. La relazione di soddisfazione $\models$ per le formule di stato è definita come:
+$$s \models a \iff a \in L(s)$$
+$$s \models \neg \boldsymbol{\phi} \iff not\ s \models \boldsymbol{\phi}$$
+$$s \models \boldsymbol{\phi} \wedge \boldsymbol{\Psi} \iff (s \models \boldsymbol{\phi})\ e\ (s \models \boldsymbol{\Psi}) $$
+$$s \models \exists \varphi \iff \pi \models \varphi\ per\ alcuni\ \pi \in Paths(s)$$
+$$s \models \forall \varphi \iff \pi \models\ per\ tutti\ i\ \pi \in Paths(s)$$
+Per un path $\pi$, la relazione di soddisfazione $\models$ per le formule di path è definita da:
+$$\pi \models \bigcircle \boldsymbol{\phi} \iff \pi[1] \models \boldsymbol{\phi}$$
+$$\pi \models \boldsymbol{\phi}\ \boldsymbol{U}\  \boldsymbol{\Psi} \iff \exists j \geqslant 0.(\pi[j] \models \boldsymbol{\Psi} \wedge (\forall 0 \leqslant k < j. \pi[k] \models \boldsymbol{\phi})$$
+\end{defn}
+\section{Model Checking di \ac{CTL}}
+
+\section{Model Checker in Python per \ac{CTL}}
+
+\section{Esempi di utilizzo del Model Checker di \ac{CTL} in Python}
 
 \begin{acronym}
 \acro{CTL}{Computational Tree Logic}
