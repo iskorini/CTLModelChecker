@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gexf xmlns="http://www.gexf.net/1.2draft" xmlns:viz="http://www.gexf.net/1.2draft/viz" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.gexf.net/1.2draft http://www.gexf.net/1.2draft/gexf.xsd" version="1.2">
+    <graph mode="static" defaultedgetype="directed">
+        <nodes>
+            <node id="S1" label="r"/>
+            <node id="2" label="y"/>
+            <node id="3" label="g"/>
+            <node id="4" label="b"/>
+        </nodes>
+        <edges>
+            <edge id="0" source="S1" target="3"/>
+            <edge id="1" source="2" target="S1"/>
+            <edge id="2" source="2" target="4"/>
+            <edge id="3" source="3" target="2"/>
+            <edge id="4" source="4" target="2"/>
+        </edges>
+    </graph>
+</gexf>
