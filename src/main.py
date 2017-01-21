@@ -20,7 +20,7 @@ if __name__ == "__main__":
     print "Start check"
     print "Elementi soddisfatti "
     result = modelChecker.iterativeCheckFormula()
-    # print result
+    print result
     nx.draw_networkx_nodes(graph,pos,
                        result[1],
                        node_color='#42f46e',

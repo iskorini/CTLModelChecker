@@ -11,11 +11,11 @@ class CTLModelChecker:
     def __init__(self, tsPath, formula):
         self.__ts = nx.read_gexf(tsPath,node_type=None, relabel=False, version='1.1draft')
         self.__nodes = nx.get_node_attributes(self.__ts, 'label')
-        print self.__nodes
         parser = CTLParser()
         parser.CTL().parseString(formula)
         self.__formula = parser.getStack()
         print formula
+        print self.__nodes
 
     def checkFormula(self):
         op =  self.__formula.pop()
@@ -101,20 +101,19 @@ class CTLModelChecker:
                 tempList.append(node)
 
     def __checkUntil(self, el0, el1):
-        E = el1
-        T = E
-        print E
+        E = el0
+        T = E[:]
         while len(E) > 0:
             s1 = E.pop()
-            s1Preset = self.__ts.predecessor(s1)
+            s1Preset = self.__ts.predecessors(s1)
             for s in s1Preset:
-                if s in list(set(el0)-set(T)):
+                if s in list(set(el1)-set(T)):
                     E.append(s)
                     T.append(s)
         return T
 
     def __checkTrue(self):
-        return self.__nodes
+        return list(self.__nodes.keys())
 
     def __checkSingle(self, i):
         tempList = []
@@ -126,9 +125,5 @@ class CTLModelChecker:
     def __checkAnd(self, el0, el1):
         return list(set(el0).intersection(el1))
 
-    def __checkNot(self, el0): #cambiare con set
-        # tempList = []
-        # for node in self.__nodes:
-        #     if node not in el0:
-        #         tempList.append(node)
-        return list(set(self.__nodes) - set(el0))
+    def __checkNot(self, el0):
+        return list(set(self.__nodes.keys()) - set(el0))
