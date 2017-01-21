@@ -103,6 +103,7 @@ class CTLModelChecker:
     def __checkUntil(self, el0, el1):
         E = el1
         T = E
+        print E
         while len(E) > 0:
             s1 = E.pop()
             s1Preset = self.__ts.predecessor(s1)

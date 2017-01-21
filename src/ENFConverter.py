@@ -65,44 +65,44 @@ class ENFConverter:
     def evaluateStack(self):
         op =  self.exprStack.pop()
         if op == "[]":
-            op1 = "[]"+self.evaluateStack()
-            print op1
+            op1 = "[]("+self.evaluateStack()+")"
+            # print op1
             return op1
         if op == "!":
-            op1 = "!"+self.evaluateStack()
-            print op1
+            op1 = "!("+self.evaluateStack()+")"
+            # print op1
             return op1
         if op == "&":
             op1 = self.evaluateStack()
             op2 = self.evaluateStack()
-            print op2 + " "+op+" "+ op1
+            # print op2 + " "+op+" "+ op1
             return op2 + " "+op+" "+ op1
         if op == "UNTIL":
             op1 = self.evaluateStack()
             op2 = self.evaluateStack()
-            print op2 + " "+op+" "+ op1
+            # print op2 + " "+op+" "+ op1
             return op2 + " "+op+" "+ op1
         if op == "FN":
             op1 = "!(NEXT(!(" +self.evaluateStack()+")))"
-            print op1
+            # print op1
             return op1
         if op == "FE":
             op1 = "!([](!(" +self.evaluateStack()+")))"
-            print op1
+            # print op1
             return op1
         if op == "FU":
             op1 = self.evaluateStack() #phi
             op2 = self.evaluateStack() #psi
             op3 = "!(!("+op2+")UNTIL(!("+op1+")&!("+op2+"))) & !([](!("+op2+")))"
-            print op3
+            # print op3
             return op3
         if op == "FA":
             op1 = "!(TRUE UNTIL !(" + self.evaluateStack() + "))"
-            print op1
+            # print op1
             return op1
         if op == "EE":
             op1 = "TRUE UNTIL (" + self.evaluateStack() + ")"
-            print op1
+            # print op1
             return op1
         if op == "TRUE":
             return "TRUE"
