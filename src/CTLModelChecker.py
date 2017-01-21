@@ -14,30 +14,6 @@ class CTLModelChecker:
         parser = CTLParser()
         parser.CTL().parseString(formula)
         self.__formula = parser.getStack()
-        print formula
-        print self.__nodes
-
-    def checkFormula(self):
-        op =  self.__formula.pop()
-        listTemp = []
-        if op == '!':
-            elements = self.checkFormula()
-            for node in self.__nodes:
-                if node not in elements:
-                    listTemp.append(node)
-            return listTemp
-        elif op == '&':
-            elements0 = self.checkFormula()
-            elements1 = self.checkFormula()
-            for e in elements0:
-                if e in elements1:
-                    listTemp.append(e)
-            return listTemp
-        elif op[0].isalpha():
-            for node in self.__nodes:
-                if op in self.__nodes[node]:
-                    listTemp.append(node)
-            return listTemp
 
     def iterativeCheckFormula(self):
         satisfactionSet = []
@@ -127,3 +103,31 @@ class CTLModelChecker:
 
     def __checkNot(self, el0):
         return list(set(self.__nodes.keys()) - set(el0))
+
+    def getTs(self):
+        return self.__nodes
+
+    def getFormulaStack(self):
+        return self.__formula
+
+    # def checkFormula(self):
+    #     op =  self.__formula.pop()
+    #     listTemp = []
+    #     if op == '!':
+    #         elements = self.checkFormula()
+    #         for node in self.__nodes:
+    #             if node not in elements:
+    #                 listTemp.append(node)
+    #         return listTemp
+    #     elif op == '&':
+    #         elements0 = self.checkFormula()
+    #         elements1 = self.checkFormula()
+    #         for e in elements0:
+    #             if e in elements1:
+    #                 listTemp.append(e)
+    #         return listTemp
+    #     elif op[0].isalpha():
+    #         for node in self.__nodes:
+    #             if op in self.__nodes[node]:
+    #                 listTemp.append(node)
+    #         return listTemp
