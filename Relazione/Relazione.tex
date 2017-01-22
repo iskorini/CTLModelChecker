@@ -1,4 +1,4 @@
-\documentclass{article}
+\documentclass[a4paper, 10pt]{article}
 
 \usepackage[utf8]{inputenc}
 \usepackage[italian]{babel}
@@ -16,6 +16,12 @@
 \usepackage[osf,sc]{mathpazo}
 \usepackage{eulervm}
 \usepackage{MnSymbol}
+\usepackage{listings}
+\usepackage{caption}
+\usepackage{color}
+\usepackage{algorithm}% http://ctan.org/pkg/algorithms
+\usepackage{algpseudocode}% http://ctan.org/pkg/algorithmicx
+
 \title{Relazione per l'approfondimento su Computational Tree Logic}
 \author{Filippo Mameli, Federico Schipani}
 \makeindex
@@ -32,6 +38,20 @@
 
 \newtheorem{prop}{Proprietà}
 \newtheorem{defn}{Definizione}
+\newtheorem{theor}{Teorema}[section]
+\numberwithin{equation}{theor}
+
+
+
+\makeatletter
+\newcommand{\newalgname}[1]{%
+  \renewcommand{\ALG@name}{#1}%
+}
+\newalgname{Algoritmo}% All algorithms will be called "Algorithme"
+\renewcommand{\listalgorithmname}{Lista di \ALG@name s}
+\makeatother
+
+
 
 \begin{document}
 \maketitle
@@ -101,6 +121,165 @@ $$\pi \models \bigcircle \boldsymbol{\phi} \iff \pi[1] \models \boldsymbol{\phi}
 $$\pi \models \boldsymbol{\phi}\ \boldsymbol{U}\  \boldsymbol{\Psi} \iff \exists j \geqslant 0.(\pi[j] \models \boldsymbol{\Psi} \wedge (\forall 0 \leqslant k < j. \pi[k] \models \boldsymbol{\phi})$$
 \end{defn}
 \section{Model Checking di \ac{CTL}}
+Data una formula \ac{CTL} $\phi$ ed un \ac{TS} l'obiettivo dell'algoritmo di Model Checking è quello di dire se il \ac{TS} soddisfa o meno la formula. Gli algoritmi proposti lavorano su formule in \ac{ENF}, definite dalla Grammatica~\ref{gra:enf}
+\begin{Grammar}
+	\begin{grammar}	
+	
+	\centering
+	<$\phi$> ::= true | $a$ | $\phi_{1} \wedge \phi_{2}$ | $\neg \phi$ | $\exists\bigcircle\phi$ | $\exists\square\phi$ | $\exists(\phi_{1} \boldsymbol{U} \phi_{2})$
+	
+	\end{grammar}
+	\caption{Grammatica delle formule in ENF}\label{gra:enf}
+\end{Grammar}
+
+il che non è limitate in quanto il Teorema~\ref{theorem:enf} dimostra che per ogni formula \ac{CTL} esiste la corrispondente formula in \ac{ENF}.
+\begin{theor}
+\label{theorem:enf}
+Per ogni formula \ac{CTL} esiste un equivalente formula \ac{CTL} in \ac{ENF}
+\end{theor}
+\begin{proof}
+Grazie alle leggi di dualità si ottengono delle regole di traduzione:
+$$\forall\bigcircle \phi \equiv \neg \exists \bigcircle \neg \phi$$
+$$\forall(\phi \boldsymbol{U} \Psi) \equiv \neg \exists( \Psi \boldsymbol{U} (\neg \phi \wedge \Psi)  )\wedge \neg\exists\neq\Psi$$
+\end{proof}
+L'algoritmo base, mostrato in Algoritmo~\ref{alg:base}, risolve ricorsivamente il problema di verificare se un determinato \ac{TS} soddisfa una formula $\phi$.
+Fondamentalmente il calcolo consiste in un attraversamento dalle foglie alla radice dell'albero di parsing della formula sugli stati $\phi$. In questo albero i nodi rappresentano le sottoformule $\Psi$ di $\phi$, mentre le foglie rappresentano le proposizioni atomiche $a \in AP$ e la costante $true$.
+Durante la computazione vengono calcolati ricorsivamente gli insiemi $Sat{\Psi}$ per ogni sottoformula $\Psi$ di $\phi$. In un generico passo intermedio il risultato della valutazione di un nodo figlio è usato e combinato in una maniera appropriata per stabilire il set di stati che soddisfa il nodo padre, chiamato $v$. Il tipo di computazione quando si raggiunge il nodo $v$ dipende dal tipo di operatore che contiene, che può essere $\wedge$, $\exists\bigcircle$ oppure $\exists\boldsymbol{U}$.\par
+Il seguente teorema definisce come vengono generati gli insiemi di sottoformule.
+
+
+\begin{theor}
+Sia $TS = (S, Act, \rightarrow, I, AP, L)$ un \ac{TS} senza stati terminali. Per tutte le formule \ac{CTL} $\phi$, $\Psi$ su AP è vero che:
+
+\begin{equation}\label{eq:te1}
+Sat(true) = S
+\end{equation}
+
+\begin{equation}\label{eq:te2}
+Sat(a) = \{s \in S | a \in L(s)\}
+\end{equation}
+
+\begin{equation}\label{eq:te3}
+Sat( \phi \wedge \Psi) = Sat(\phi)  \cap Sat(\Psi)
+\end{equation}
+
+\begin{equation}\label{eq:te4}
+Sat(\neg \phi) = S \backslash Sat(\phi)
+\end{equation}
+
+\begin{equation}\label{eq:te5}
+Sat(\exists\bigcircle\phi) = \{s \in S | Post(s) \cap Sat(\phi) \neq \emptyset\}
+\end{equation}
+
+\begin{equation}\label{eq:te6}
+\begin{aligned}
+Sat(\exists(\phi \boldsymbol{U} \Psi))\ \text{è il più piccolo sottoinsieme T di S tale per cui } \\
+(Sat(\Psi) \subseteq T \wedge (s \in Sat(\phi) \wedge Post(s) \cap T \neq \emptyset)) \implies s \in T
+\end{aligned}
+\end{equation}
+
+\begin{equation}\label{eq:te7}
+\begin{aligned}
+Sat(\exists(\square\phi)) \text{è il più grande sottoinsieme T di S tale che} \\ 
+T \subseteq Sat (\phi) \wedge s \in T \implies Post(s) \cap T \neq \emptyset
+\end{aligned}
+\end{equation}
+\end{theor}
+\begin{proof}
+Da scrivere per \eqref{eq:te6} e \eqref{eq:te7}.
+\end{proof}
+
+
+\begin{algorithm}
+\label{alg:base}
+\caption{Algoritmo di model checking base per \ac{CTL}}
+\begin{algorithmic}[1]
+\Procedure{CTLModelChecking}{$TS, \phi$}
+\ForAll{$i \leq |\phi|$}
+\ForAll{$\Psi \in Sub(\phi)\ con\ |\Psi| = i$}
+\State calcola $Sat(\Psi)$ da $Sat(\Psi^{'})$
+\EndFor
+\EndFor
+\State \textbf{return} $I  \subseteq Sat(\phi)$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+
+
+\begin{algorithm}
+\label{alg:until}
+\caption{Algoritmo per $Sat(\exists(\phi \boldsymbol{U} \Psi)$)}
+\begin{algorithmic}[1]
+\Procedure{ComputeExistsUntil}{$TS, \phi \boldsymbol{U} \Psi$}
+\State E $:= Sat(\Psi)$
+\State T $:=$E
+\While{$E \neq \varnothing $}
+\State let $s^{1} \in E$
+\State $E:=E \backslash \{s^{1}\}$
+\ForAll{ $s \in Pre(s^{1})$}
+\If{$s \in Sat(\phi)\backslash T$}
+\State $E:= E \cup \{s\}$
+\State $T:=T \cup\{s\}$
+\EndIf
+\EndFor
+\EndWhile
+\State \textbf{return} $T$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+
+
+\begin{algorithm}
+\label{alg:always}
+\caption{Algoritmo per $Sat(\exists \square \phi)$}
+\begin{algorithmic}[1]
+\Procedure{ComputeExistsAlways}{$TS, (\exists \square \phi)$}
+\State S $:= S \backslash Sat(\phi)$
+\State T $:=Sat(\phi)$
+\ForAll{$s \in Sat(\phi)$}
+\State $count[s] := |Post(s)|$
+\EndFor
+\While{$E \neq \varnothing $}
+\State let $s^{1} \in E$
+\State $E:=E \backslash \{s^{1}\}$
+\ForAll{ $s \in Pre(s^{1})$}
+\If{$s \in T$}
+\State $count[s] := count[s]-1$
+\If{$count[s] = 0$}
+\State $T := T \backslash \{s\}$
+\State $E := E \cup \{s\}$
+\EndIf
+\EndIf
+\EndFor
+\EndWhile
+\State \textbf{return} $T$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+
+
+\begin{algorithm}
+\label{alg:alternativealways}
+\caption{Algoritmo alternativo per $Sat(\exists \square \phi)$}
+\begin{algorithmic}[1]
+\Procedure{AlternativeComputeExistsAlways}{$TS, (\exists \square \phi)$}
+\State $S^{1} := Sat{\phi}$
+\State $\rightarrow^{1} := \rightarrow \cap(S^{1} \times Act \times S^{1})$
+\State $I^{1} := I \cap S^{1}$
+\State $L^{1}(s) := L(s) | s \in S^{1}$
+\State $TS[\phi] := (S^{1}, Act, \rightarrow^{1}, I^{1}, AP, L^{1}) $
+\State $T := ComputeSSC(TS[\phi])$
+\State return $Reach(I, T)$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+
+
+\subsection{Complessità dell'algoritmo}
 
 \section{Model Checker in Python per \ac{CTL}}
 
@@ -110,6 +289,7 @@ $$\pi \models \boldsymbol{\phi}\ \boldsymbol{U}\  \boldsymbol{\Psi} \iff \exists
 \acro{CTL}{Computational Tree Logic}
 \acro{LTL}{Linear Temporal Logic}
 \acro{TS}{Transition System}
+\acro{ENF}{Existential Normal Form}
 \end{acronym}
 
 \end{document}
