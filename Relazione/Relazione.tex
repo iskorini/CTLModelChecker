@@ -57,19 +57,19 @@
 \maketitle
 \tableofcontents
 \section{Introduzione a \ac*{CTL}}
-\acf{CTL} è una logica proposta da Clarke e Emerson per far fronte ad alcuni problemi noti di \ac{LTL}. In \ac{LTL} il concetto di tempo è lineare, ciò vuol dire che in un determinato momento abbiamo un unico possibile futuro. Ciò comporta che una determinata formula $\phi$ è valida in uno stato $s$, se e solo se tutte le possibili computazioni che partono da quello stato soddisfano la formula. Più formalmente:
+\acf{CTL} è una logica proposta da Clarke e Emerson per far fronte ad alcuni problemi noti di \ac{LTL}. In \ac{LTL} il concetto di tempo è lineare, ciò vuol dire che in un determinato istante abbiamo un unico possibile futuro. Ciò comporta che una determinata formula $\phi$ è valida in uno stato $s$, se e solo se tutte le possibili computazioni che partono da quello stato soddisfano la formula. Più formalmente:
 \begin{equation}\label{first}
-    s \models \phi \iff \pi \models \phi \ \forall \  paths \  \pi \ che\  inizia\  in\  s
+    s \models \phi \iff \pi \models \phi \ \forall \  path \  \pi \ che\  inizia\  in\  s
 \end{equation}
-Come si può notare dalla Formula \eqref{first} non è possibile imporre facilmente condizioni di soddisfacibilità solo su alcuni di questi path. Dato uno stato $s$, verificare che solo alcune computazioni soddisfano una formula $\phi$ può essere fatto usando la dualità tra l'operatore universale ed esistenziale. Quindi verificare  $ s \models  \exists \phi $ corrisponde a verificare $s \models \forall \neg \phi $. Se quest'ultima non è soddisfatta allora esisterà una computazione che soddisferà $\phi$, altrimenti non esisterà. \par
-Questo sotterfugio non è possibile usarlo per proprietà più complicate. Per esempio la proprietà
+Come si può notare dalla Formula \eqref{first} non è possibile imporre facilmente condizioni di soddisfacibilità solo su alcuni di questi path. Dato uno stato $s$, si può verificare che solo alcune computazioni soddisfano una formula $\phi$  usando la dualità tra l'operatore universale ed esistenziale. Quindi verificare  $ s \models  \exists \phi $ corrisponde a verificare $s \models \neg \forall \neg \phi $. Se quest'ultima non è soddisfatta allora esisterà una computazione che soddisfa $\phi$, altrimenti non esisterà. \par
+Non è possibile usare questo sotterfugio per proprietà più complicate. Per esempio la proprietà
 \begin{prop}
 \label{prop:first}
 Per ogni computazione è sempre possibile ritornare in uno stato iniziale 
 \end{prop}
-non è possibile esprimerla in \ac{LTL}. Un tentativo potrebbe essere $\square\lozenge start$, dove $start$ indica uno stato iniziale. Tuttavia una formula di questo tipo è troppo forte, in quanto questa formula impone che una computazione ritorni sempre in uno stato iniziale, e non soltanto eventualmente. \par
-\ac{CTL} risolve questi problemi introducendo una nozione di tempo che si basa sulle diramazioni. Quindi non abbiamo più un infinita sequenza di stati, ma un infinito albero di stati. Questo comporta che in un determinato momento avremo diversi possibili futuri.\par
-La semantica di questa logica è definita in termini di infiniti alberi, dove ogni diramazione rappresenta un singolo percorso. L'albero quindi è una fedele rappresentazione di tutti i possibili path, e si può facilmente ottenere schiudendo il \ac{TS}.\par
+non è esprimibile in \ac{LTL}. Un tentativo potrebbe essere $\square\lozenge start$, dove $start$ indica uno stato iniziale. Tuttavia una formula di questo tipo è troppo forte, in quanto impone che una computazione ritorni sempre in uno stato iniziale, e non soltanto eventualmente. \par
+\ac{CTL} risolve questi problemi introducendo una nozione di tempo che si basa sulle diramazioni. Quindi non abbiamo più un'infinita sequenza di stati, ma un infinito albero di stati. Questo comporta che in un determinato istante avremo diversi possibili futuri.\par
+La semantica di questa logica è definita in termini di infiniti alberi, dove ogni diramazione rappresenta un singolo percorso. L'albero quindi è una fedele rappresentazione di tutti i possibili path, e si può facilmente ottenere srotolando il \ac{TS}.\par
 In \ac{CTL} sono presenti quantificatori, definiti sui path, di tipo esistenziale ($\exists$) ed universale ($\forall$). La Proprietà $\exists\lozenge \psi$ dice che esiste una computazione che soddisfa $\lozenge\psi$, più intuitivamente vuol dire che esisterà almeno una possibile computazione nel quale uno stato $s$ che soddisfa $\psi$ verrà eventualmente raggiunto. Tuttavia questo non esclude la possibilità che ci possono essere computazioni per le quali questa proprietà non viene soddisfatta.
 La proprietà \ref{prop:first} citata in precedenza è possibile ottenerla annidando quantificatori esistenziali ed universali in questo modo:
 \begin{equation}
@@ -142,13 +142,29 @@ Grazie alle leggi di dualità si ottengono delle regole di traduzione:
 $$\forall\bigcircle \phi \equiv \neg \exists \bigcircle \neg \phi$$
 $$\forall(\phi \boldsymbol{U} \Psi) \equiv \neg \exists( \Psi \boldsymbol{U} (\neg \phi \wedge \Psi)  )\wedge \neg\exists\neq\Psi$$
 \end{proof}
-L'algoritmo base, mostrato in Algoritmo~\ref{alg:base}, risolve ricorsivamente il problema di verificare se un determinato \ac{TS} soddisfa una formula $\phi$.
+\begin{algorithm}
+\label{alg:base}
+\caption{Algoritmo di model checking base per \ac{CTL}}
+\begin{algorithmic}[1]
+\Procedure{CTLModelChecking}{$TS, \phi$}
+\ForAll{$i \leq |\phi|$}
+\ForAll{$\Psi \in Sub(\phi)\ con\ |\Psi| = i$}
+\State calcola $Sat(\Psi)$ da $Sat(\Psi^{'})$
+\EndFor
+\EndFor
+\State \textbf{return} $I  \subseteq Sat(\phi)$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+%correggere riferimento non funzionante
+L'algoritmo base, mostrato in Algoritmo \ref{alg:base}, risolve ricorsivamente il problema di verificare se un determinato \ac{TS} soddisfa una formula $\phi$.
 Fondamentalmente il calcolo consiste in un attraversamento dalle foglie alla radice dell'albero di parsing della formula sugli stati $\phi$. In questo albero i nodi rappresentano le sottoformule $\Psi$ di $\phi$, mentre le foglie rappresentano le proposizioni atomiche $a \in AP$ e la costante $true$.
-Durante la computazione vengono calcolati ricorsivamente gli insiemi $Sat{\Psi}$ per ogni sottoformula $\Psi$ di $\phi$. In un generico passo intermedio il risultato della valutazione di un nodo figlio è usato e combinato in una maniera appropriata per stabilire il set di stati che soddisfa il nodo padre, chiamato $v$. Il tipo di computazione quando si raggiunge il nodo $v$ dipende dal tipo di operatore che contiene, che può essere $\wedge$, $\exists\bigcircle$ oppure $\exists\boldsymbol{U}$.\par
+Durante la computazione vengono calcolati ricorsivamente gli insiemi $Sat{\Psi}$ per ogni sottoformula $\Psi$ di $\phi$. Ad ogni passo, per stabilire quali sono gli stati che soddisfano un nodo $v$, si combinano le valutazioni (già effettuate) dei suoi nodi figli. Il tipo di computazione quando si raggiunge il nodo $v$ dipende dal tipo di operatore che contiene, che può essere $\wedge$, $\exists\bigcircle$ oppure $\exists\boldsymbol{U}$.\par
 Il seguente teorema definisce come vengono generati gli insiemi di sottoformule.
 
 
 \begin{theor}
+\label{eq:teoremaCaratterizzazione}
 Sia $TS = (S, Act, \rightarrow, I, AP, L)$ un \ac{TS} senza stati terminali. Per tutte le formule \ac{CTL} $\phi$, $\Psi$ su AP è vero che:
 
 \begin{equation}\label{eq:te1}
@@ -185,27 +201,11 @@ T \subseteq Sat (\phi) \wedge s \in T \implies Post(s) \cap T \neq \emptyset
 \end{aligned}
 \end{equation}
 \end{theor}
-\begin{proof}
-Da scrivere per \eqref{eq:te6} e \eqref{eq:te7}.
-\end{proof}
 
 
-\begin{algorithm}
-\label{alg:base}
-\caption{Algoritmo di model checking base per \ac{CTL}}
-\begin{algorithmic}[1]
-\Procedure{CTLModelChecking}{$TS, \phi$}
-\ForAll{$i \leq |\phi|$}
-\ForAll{$\Psi \in Sub(\phi)\ con\ |\Psi| = i$}
-\State calcola $Sat(\Psi)$ da $Sat(\Psi^{'})$
-\EndFor
-\EndFor
-\State \textbf{return} $I  \subseteq Sat(\phi)$
-\EndProcedure
-\end{algorithmic}
-\end{algorithm}
 
-
+Le caratterizzazioni fornite dal Teorema \ref{eq:teoremaCaratterizzazione} forniscono una base per la costruzione di algoritmi per calcolare gli insiemi di soddisfacibilità per i vari operatori. \par
+Per l'operatore Until $\boldsymbol{U}$ la \eqref{eq:te6} del Teorema \ref{eq:teoremaCaratterizzazione} suggerisce di usare una procedura iterativa tale per cui $T_{0} = Sat(\Psi)$ e $T_{i+1} = T_{i} \cup \{s \in Sat{\phi} | Post(s) \cap T_{i} \neq \emptyset \}$. L'insieme $T_{i}$ contiene tutti gli stati che possono raggiungere uno stato $s \in Sat{\Psi}$ in $i$ passi attraverso path che passano per stati $s^{1} \in Sat{\psi}$.
 
 \begin{algorithm}
 \label{alg:until}
@@ -228,15 +228,15 @@ Da scrivere per \eqref{eq:te6} e \eqref{eq:te7}.
 \EndProcedure
 \end{algorithmic}
 \end{algorithm}
-
-
-
+L'Algoritmo \ref{alg:until} parte calcolando tutti gli stati che soddisfano $\Psi$, che vengono poi copiati in due insiemi: $E$ e $T$. Successivamente parte un ciclo che effettua una ricerca andando ad analizzare i predecessori degli stati. In questo ciclo viene preso un elemento $s'$ dall'insieme $E$ e ne vengono analizzati i predecessori. Se uno stato $s$ appartiene a  $Pre(s') \backslash T$ allora viene inserito in $E$ ed in $T$. Alla fine l'insieme T conterrà tutti gli stati che soddisfano la formula  $\exists(\phi \boldsymbol{U} \Psi)$.\par
+L'algoritmo per calcolare $Sat(\exists \square \phi)$ sfrutta la caratterizzazione fornita da \ref{eq:te7}. L'idea base è computare $Sat(\exists \square \phi)$ iterativamente in questo modo:
+$$T_{0} = Sat(\phi)\ e \ T_{i+1} = T_{i} \cap \{s \in Sat(\phi | Post(s) \cap T_{i} \neq \emptyset)$$
 \begin{algorithm}
 \label{alg:always}
 \caption{Algoritmo per $Sat(\exists \square \phi)$}
 \begin{algorithmic}[1]
 \Procedure{ComputeExistsAlways}{$TS, (\exists \square \phi)$}
-\State S $:= S \backslash Sat(\phi)$
+\State E $:= S \backslash Sat(\phi)$
 \State T $:=Sat(\phi)$
 \ForAll{$s \in Sat(\phi)$}
 \State $count[s] := |Post(s)|$
@@ -258,29 +258,40 @@ Da scrivere per \eqref{eq:te6} e \eqref{eq:te7}.
 \EndProcedure
 \end{algorithmic}
 \end{algorithm}
+L'algoritmo \ref{alg:always} realizza questa procedura con una ricerca volta all'indietro che inizia con
+$$T = Sat(\phi) \qquad e \qquad E = S\backslash Sat(\phi)$$
+in questo caso $T$ è uguale a $T_{0}$ ed $E$ contiene tutti gli stati per cui $\exists \square \phi$ è falsa. Durante la ricerca gli stati $s \in T$ che non soddisfano $\exists \square \phi$ vengono rimossi se $Post(s) \cap T = \emptyset$.
+Questa verifica è resa possibile da un array chiamato 
+$count[s]$ definito $\forall s \in Sat(\phi)$ che conta quanti successori ha lo stato $s$. Questo contatore verrà decrementato ogni volta che uno stato contenuto nei predecessori di uno stato $s' \in E$ è anche in $T$. Quando il contatore è $0$ lo stato verrà marcato come stato che non soddisfa $\forall s \in Sat(\phi)$, quindi sarà rimosso da $T$ ed aggiunto ad $E$.
 
 
 
-\begin{algorithm}
-\label{alg:alternativealways}
-\caption{Algoritmo alternativo per $Sat(\exists \square \phi)$}
-\begin{algorithmic}[1]
-\Procedure{AlternativeComputeExistsAlways}{$TS, (\exists \square \phi)$}
-\State $S^{1} := Sat{\phi}$
-\State $\rightarrow^{1} := \rightarrow \cap(S^{1} \times Act \times S^{1})$
-\State $I^{1} := I \cap S^{1}$
-\State $L^{1}(s) := L(s) | s \in S^{1}$
-\State $TS[\phi] := (S^{1}, Act, \rightarrow^{1}, I^{1}, AP, L^{1}) $
-\State $T := ComputeSSC(TS[\phi])$
-\State return $Reach(I, T)$
-\EndProcedure
-\end{algorithmic}
-\end{algorithm}
+%\begin{algorithm}
+%\label{alg:alternativealways}
+%\caption{Algoritmo alternativo per $Sat(\exists \square \phi)$}
+%\begin{algorithmic}[1]
+%\Procedure{AlternativeComputeExistsAlways}{$TS, (\exists \square \phi)$}
+%\State $S^{1} := Sat{\phi}$
+%\State $\rightarrow^{1} := \rightarrow \cap(S^{1} \times Act \times S^{1})%$
+%\State $I^{1} := I \cap S^{1}$
+%\State $L^{1}(s) := L(s) | s \in S^{1}$
+%\State $TS[\phi] := (S^{1}, Act, \rightarrow^{1}, I^{1}, AP, L^{1}) $
+%\State $T := ComputeSSC(TS[\phi])$
+%\State return $Reach(I, T)$
+%\EndProcedure
+%\end{algorithmic}
+%\end{algorithm}
 
 
 
 \subsection{Complessità dell'algoritmo}
-
+\begin{theor}
+Per un \acf{TS} con N stati e K transizioni, ed una formula CTL $\phi$, il problema di $TS \models \phi$ può essere risolto in tempo $$O((N+K) \cdot |\phi|)$$
+\end{theor}
+\begin{proof}
+La complessità in tempo di questo algoritmo è determinata come segue. Sia \ac{TS} un \acf{TS} finito con N stati e K transizioni. Sotto l'assunzione che l'insieme di predecessori di uno stato sono rappresentati da una \textit{Linked List}, la complessità degli Algoritmi \ref{alg:always} e \ref{alg:until} sono $O(N+K)$. Visto che la computazione del $Sat(\phi)$ viene effettuata in una maniera \textit{bottom-up} la complssità risulta lineare nella dimensione della formula, quindi la complessità dell'algoritmo \ref{alg:base} è data da $$O((N+K) \cdot |\phi|) $$
+\end{proof}
+Va però ricordato che l'algoritmo proposto lavora con formule in \ac{ENF}, il che può portare ad una crescita esponenziale della dimensione della formula. Fortunatamente però esistono algoritmi per calcolare gli insiemi di stati soddisfatti per formule non in ENF, che hanno complessità $O(N+K)$.
 \section{Model Checker in Python per \ac{CTL}}
 
 \section{Esempi di utilizzo del Model Checker di \ac{CTL} in Python}
