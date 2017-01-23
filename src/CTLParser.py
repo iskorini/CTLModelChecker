@@ -76,7 +76,9 @@ class CTLParser:
         else:
             return op+" "+self.evaluateStack()
 
-    def getStack(self):
+    def getParsedFormula(self, formula):
+        parser = CTLParser()
+        results = parser.CTL().parseString( formula )
         return self.exprStack
 
 if __name__ == "__main__":

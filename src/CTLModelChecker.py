@@ -1,6 +1,8 @@
 import networkx as nx
+import sys
 from pyparsing import alphas
 from CTLParser import CTLParser
+from ENFConverter import ENFConverter
 
 class CTLModelChecker:
 
@@ -11,9 +13,7 @@ class CTLModelChecker:
     def __init__(self, tsPath, formula):
         self.__ts = nx.read_gexf(tsPath,node_type=None, relabel=False, version='1.1draft')
         self.__nodes = nx.get_node_attributes(self.__ts, 'label')
-        parser = CTLParser()
-        parser.CTL().parseString(formula)
-        self.__formula = parser.getStack()
+        self.__formula = CTLParser().getParsedFormula(formula)
 
     def iterativeCheckFormula(self):
         satisfactionSet = []
@@ -42,6 +42,12 @@ class CTLModelChecker:
 
         return (self.__checkInitialStates(satisfactionSet), satisfactionSet[0])
 
+    def __checkInitialStates(self,satSet):
+        initialStates = filter(lambda x: 'S' in x, self.__nodes)
+        for state in initialStates:
+            if state not in satSet[0]:
+                return False
+        return True
 
     def __checkAlways(self, el0):
         E = list(set(self.__nodes)-set(el0))
@@ -58,16 +64,7 @@ class CTLModelChecker:
                     if count[s1pre] == 0:
                         E.append(s1pre)
                         T.remove(s1pre)
-
         return T
-
-    def __checkInitialStates(self,satSet):
-        initialStates = filter(lambda x: 'S' in x, self.__nodes)
-        for state in initialStates:
-            if state not in satSet[0]:
-                return False
-        return True
-
 
     def __checkNext(self, el0):
         tempList = []
@@ -131,3 +128,9 @@ class CTLModelChecker:
     #             if op in self.__nodes[node]:
     #                 listTemp.append(node)
     #         return listTemp
+
+if __name__ == '__main__':
+    args = sys.argv
+    convertedFormula = ENFConverter().convert(args[1])
+    modelChecker = CTLModelChecker(args[2], convertedFormula)
+    print modelChecker.iterativeCheckFormula()
