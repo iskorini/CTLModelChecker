@@ -11,7 +11,7 @@ if __name__ == "__main__":
     nx.draw_networkx_labels(graph,pos,font_size=12)
     converter = ENFConverter()
     # formula = "EE (!(!(a & c & !b) & !(!a & !c & b)))"
-    formula = "[]b"
+    formula = " FE b"
     print "Formula: ",formula
     convertedFormula = converter.convert(formula)
     print "Formula in ENF: ", convertedFormula
