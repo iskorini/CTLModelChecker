@@ -1,7 +1,7 @@
 from array import array
 
 stateTransition = {'T': 'H', 'H': 'W','W': 'E','E': 'T'} # transizioni da uno stato all altro
-numeroFilosofi = 3
+numeroFilosofi = 2
 def next (state, fork):
     successors = [] # lista di tuple che contiene elementi (STATOSUCC, NUMFORK)
     for i in range(1,2**numeroFilosofi):
@@ -29,6 +29,8 @@ def checkEating(state):
         return False
     return True
 if __name__ == "__main__":
-    stato = "TWW"
-    print stato
-    print next(stato , 1)
+    print "TT ",next("TT" , 2)
+    print "HH ",next("HH" , 2)
+    print "WW ",next("WW" , 0), " caso Deadlock"
+    print "WH ",next("WH" , 1)
+    print "EH ",next("EH" , 0)
