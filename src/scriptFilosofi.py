@@ -1,7 +1,8 @@
 from array import array
+import xml.etree.ElementTree as ET
 
 stateTransition = {'T': 'H', 'H': 'W','W': 'E','E': 'T'} # transizioni da uno stato all altro
-numeroFilosofi = 2
+
 def next (state, fork):
     successors = [] # lista di tuple che contiene elementi (STATOSUCC, NUMFORK)
     for i in range(1,2**numeroFilosofi):
@@ -28,9 +29,26 @@ def checkEating(state):
     if state[0] == 'E' and state[-1] == 'E': # caso ultimo e primo filosofo che condividono le fork
         return False
     return True
+
 if __name__ == "__main__":
-    print "TT ",next("TT" , 2)
-    print "HH ",next("HH" , 2)
-    print "WW ",next("WW" , 0), " caso Deadlock"
-    print "WH ",next("WH" , 1)
-    print "EH ",next("EH" , 0)
+    numeroFilosofi = 3
+    statoIniziale = "T" * numeroFilosofi
+    states = {} # dizionario degli stati
+    states[statoIniziale] = [] # primo elemento
+    stack = []
+    stack.append((statoIniziale,numeroFilosofi))
+    while len(stack) > 0:
+        s = stack.pop(0)
+        successors = next(s[0], s[1])
+        for nextState in successors:
+            states[s[0]].append(nextState[0]) # aggiunge al elemento del dizionario gli stati di Post(elemento)
+            if states.has_key(nextState[0]) == 0: # se lo stato e' nuovo
+                states[nextState[0]] = [] # si aggiunge al dizionario e si associa ad una lista di adiacenza vuota
+                stack.append(nextState) # si aggiunge allo stack per trovare i successori
+        print s[0],"forchette disp ",s[1],":" , states[s[0]]
+
+    # print "TT ",next("TT" , 2)
+    # print "HH ",next("HH" , 2)
+    # print "WW ",next("WW" , 0), " caso Deadlock"
+    # print "WH ",next("WH" , 1)
+    # print "EH ",next("EH" , 0)
