@@ -48,7 +48,6 @@ def checkEating(state):
     return True
 
 if __name__ == "__main__":
-    generateXML()
     numeroFilosofi = 3
     statoIniziale = "T" * numeroFilosofi
     states = {}  # dizionario degli stati
@@ -68,7 +67,6 @@ if __name__ == "__main__":
                 # si aggiunge allo stack per trovare i successori
                 stack.append(nextState)
         print s[0], "forchette disp ", s[1], ":", states[s[0]]
-    print states
 
     # print "TT ",next("TT" , 2)
     # print "HH ",next("HH" , 2)

@@ -7,15 +7,13 @@ from ENFConverter import ENFConverter
 
 class CTLModelChecker:
 
-    __ts = ""
-    __formula = ""
+    __ts = ''
+    __formula = ''
     __satisfactionSet = []
     __nodes = []
 
     def __init__(self, tsPath, formula):
-        ts = nx.read_gexf(
-                tsPath, node_type=None, relabel=False, version='1.1draft'
-            )
+        ts = nx.read_gexf(tsPath, node_type=None, relabel=False, version='1.1draft')
         self.__ts = ts
         self.__nodes = nx.get_node_attributes(self.__ts, 'label')
         self.__formula = CTLParser().getParsedFormula(formula)
@@ -55,7 +53,7 @@ class CTLModelChecker:
         return True
 
     def __checkAlways(self, el0):
-        E = list(set(self.__nodes)-set(el0))
+        E = list(set(self.__nodes) - set(el0))
         T = el0
         count = dict()
         for el in el0:  # cambiare con map
@@ -65,7 +63,7 @@ class CTLModelChecker:
             s1Preset = self.__ts.predecessors(s1)
             for s1pre in s1Preset:
                 if s1pre in T:
-                    count[s1pre] = count[s1pre]-1
+                    count[s1pre] = count[s1pre] - 1
                     if count[s1pre] == 0:
                         E.append(s1pre)
                         T.remove(s1pre)
@@ -85,7 +83,7 @@ class CTLModelChecker:
             s1 = E.pop()
             s1Preset = self.__ts.predecessors(s1)
             for s in s1Preset:
-                if s in list(set(el1)-set(T)):
+                if s in list(set(el1) - set(T)):
                     E.append(s)
                     T.append(s)
         return T
@@ -133,6 +131,7 @@ class CTLModelChecker:
     #             if op in self.__nodes[node]:
     #                 listTemp.append(node)
     #         return listTemp
+
 
 if __name__ == '__main__':
     args = sys.argv
