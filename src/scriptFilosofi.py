@@ -1,17 +1,49 @@
 from array import array
-from xml.etree.ElementTree import Element, SubElement, Comment, tostring
+from xml.etree.ElementTree import Element, SubElement, Comment, tostring, ElementTree
+from xml.dom import minidom
 # transizioni da uno stato all altro
 stateTransition = {'T': 'H', 'H': 'W', 'W': 'E', 'E': 'T'}
 
+def prettify(elem):
+    rough_string = tostring(elem)
+    reparsed = minidom.parseString(rough_string)
+    return reparsed.toprettyxml(indent="  ")
 
-def generateXML():
+def generateXML(philnumber):
+    numeroFilosofi = philnumber
+    statoIniziale = "T" * numeroFilosofi
+    states = {}  # dizionario degli stati
+    states[statoIniziale] = []  # primo elemento
+    stack = []
+    stack.append((statoIniziale, numeroFilosofi))
+    while len(stack) > 0:
+        s = stack.pop(0)
+        successors = next(s[0], s[1], philnumber)
+        for nextState in successors:
+            # aggiunge al elemento del dizionario gli stati di Post(elemento)
+            states[s[0]].append(nextState[0])
+            if nextState[0] not in states.keys():  # se lo stato e' nuovo
+                # si aggiunge al dizionario e si associa ad una lista di
+                # adiacenza vuota
+                states[nextState[0]] = []
+                # si aggiunge allo stack per trovare i successori
+                stack.append(nextState)
+        print s[0], "forchette disp ", s[1], ":", states[s[0]]
     top = Element('gefx', attrib={'xmlns': "http://www.gexf.net/1.2draft", 'xmlns:viz': "http://www.gexf.net/1.2draft/viz", 'xmlns:xsi': "http://www.w3.org/2001/XMLSchema-instance", 'xsi:schemaLocation': "http://www.gexf.net/1.2draft http://www.gexf.net/1.2draft/gexf.xsd", 'version': "1.2"})
     graphNode = SubElement(top, 'graph', attrib={'mode': "static", 'defaultedgetype': "directed"})
     edgesNode = SubElement(top, 'edges')
-    print tostring(top)
+    i = 0
+    for nodes in states:
+        singlenode = SubElement(graphNode, 'node', attrib={'id' : nodes, 'label': nodes})
+        for nextValue in states[nodes]:
+            transition = SubElement(edgesNode, 'edge', attrib={'id': str(i), 'source': nodes, 'target':nextValue})
+            i+=1
+    output_file = open('../inputfiles/filosofi.gefx', 'w')
+    prettifiedfile = prettify(top)
+    output_file.write(prettifiedfile[15+8:])
+    output_file.close()
 
-
-def next(state, fork):
+def next(state, fork, numeroFilosofi):
     # lista di tuple che contiene elementi (STATOSUCC, NUMFORK)
     successors = []
     for i in range(1, 2**numeroFilosofi):
@@ -50,25 +82,7 @@ def checkEating(state):
 
 
 if __name__ == "__main__":
-    numeroFilosofi = 3
-    statoIniziale = "T" * numeroFilosofi
-    states = {}  # dizionario degli stati
-    states[statoIniziale] = []  # primo elemento
-    stack = []
-    stack.append((statoIniziale, numeroFilosofi))
-    while len(stack) > 0:
-        s = stack.pop(0)
-        successors = next(s[0], s[1])
-        for nextState in successors:
-            # aggiunge al elemento del dizionario gli stati di Post(elemento)
-            states[s[0]].append(nextState[0])
-            if nextState[0] not in states.keys():  # se lo stato e' nuovo
-                # si aggiunge al dizionario e si associa ad una lista di
-                # adiacenza vuota
-                states[nextState[0]] = []
-                # si aggiunge allo stack per trovare i successori
-                stack.append(nextState)
-        print s[0], "forchette disp ", s[1], ":", states[s[0]]
+    generateXML(3)
 
     # print "TT ",next("TT" , 2)
     # print "HH ",next("HH" , 2)
