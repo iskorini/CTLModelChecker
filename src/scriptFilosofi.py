@@ -55,7 +55,7 @@ if __name__ == '__main__':
         for nextState in successors:
             # aggiunge al elemento del dizionario gli stati di Post(elemento)
             states[s[0]].append(nextState[0])
-            if nextState[0] in states:  # se lo stato e' nuovo
+            if nextState[0] not in states.keys():  # se lo stato e' nuovo
                 # si aggiunge al dizionario e si associa ad una lista di
                 # adiacenza vuota
                 states[nextState[0]] = []
