@@ -1,7 +1,14 @@
 from array import array
-import xml.etree.ElementTree as ET
+from xml.etree.ElementTree import Element, SubElement, Comment, tostring
 # transizioni da uno stato all altro
 stateTransition = {'T': 'H', 'H': 'W', 'W': 'E', 'E': 'T'}
+
+
+def generateXML():
+    top = Element('gefx', attrib={'xmlns': "http://www.gexf.net/1.2draft", 'xmlns:viz': "http://www.gexf.net/1.2draft/viz", 'xmlns:xsi': "http://www.w3.org/2001/XMLSchema-instance", 'xsi:schemaLocation': "http://www.gexf.net/1.2draft http://www.gexf.net/1.2draft/gexf.xsd", 'version': "1.2"})
+    graphNode = SubElement(top, 'graph', attrib={'mode': "static", 'defaultedgetype': "directed"})
+    edgesNode = SubElement(top, 'edges')
+    print tostring(top)
 
 
 def next(state, fork):
@@ -42,9 +49,9 @@ def checkEating(state):
     return True
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     numeroFilosofi = 3
-    statoIniziale = 'T' * numeroFilosofi
+    statoIniziale = "T" * numeroFilosofi
     states = {}  # dizionario degli stati
     states[statoIniziale] = []  # primo elemento
     stack = []
@@ -61,10 +68,10 @@ if __name__ == '__main__':
                 states[nextState[0]] = []
                 # si aggiunge allo stack per trovare i successori
                 stack.append(nextState)
-        print s[0], 'forchette disp ', s[1], ':', states[s[0]]
+        print s[0], "forchette disp ", s[1], ":", states[s[0]]
 
-    # print 'TT ',next('TT' , 2)
-    # print 'HH ',next('HH' , 2)
-    # print 'WW ',next('WW' , 0), ' caso Deadlock'
-    # print 'WH ',next('WH' , 1)
-    # print 'EH ',next('EH' , 0)
+    # print "TT ",next("TT" , 2)
+    # print "HH ",next("HH" , 2)
+    # print "WW ",next("WW" , 0), " caso Deadlock"
+    # print "WH ",next("WH" , 1)
+    # print "EH ",next("EH" , 0)
