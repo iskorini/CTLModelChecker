@@ -15,11 +15,11 @@ class CTLParser:
             self.exprStack.append('!')
 
     def pushUAlways(self, strg, loc, toks):
-        if toks and toks[0] == "[]":
+        if toks and toks[0] == '[]':
             self.exprStack.append('[]')
 
     def pushNext(self, strg, loc, toks):
-        if toks and toks[0] == "NEXT":
+        if toks and toks[0] == 'NEXT':
             self.exprStack.append('NEXT')
 
     bnf = None
@@ -27,21 +27,21 @@ class CTLParser:
     def CTL(self):
         global bnf
         if not bnf:
-            atomicVal = Word("abcdefghijklmnopqrstuvwxyz") | "TRUE"
-            lpar = Literal("(").suppress()
-            rpar = Literal(")").suppress()
-            notOp = Literal("!")
-            andOp = Literal("&")
-            untilOp = Literal("UNTIL")
-            forAllEventualy = Literal("FE")
-            existsEventualy = Literal("EE")
-            forAllAlways = Literal("FA")
-            forAllNext = Literal("FN")
-            forAllUntil = Literal("FU")
+            atomicVal = Word('abcdefghijklmnopqrstuvwxyz') | 'TRUE'
+            lpar = Literal('(').suppress()
+            rpar = Literal(')').suppress()
+            notOp = Literal('!')
+            andOp = Literal('&')
+            untilOp = Literal('UNTIL')
+            forAllEventualy = Literal('FE')
+            existsEventualy = Literal('EE')
+            forAllAlways = Literal('FA')
+            forAllNext = Literal('FN')
+            forAllUntil = Literal('FU')
             expr = Forward()
-            atom0 = (Optional("[]") + (atomicVal | lpar + atomicVal + rpar).setParseAction(self.pushFirst) | Optional("[]") + (lpar + expr + rpar)).setParseAction(self.pushUAlways)
-            atom1 = (Optional("!") + (atomicVal | lpar + atomicVal + rpar).setParseAction(self.pushFirst) | Optional("!") + (lpar + expr + rpar)).setParseAction(self.pushUNot)
-            atom2 = (Optional("NEXT") + (atomicVal | lpar + atomicVal + rpar).setParseAction(self.pushFirst) | Optional("NEXT") + (lpar + expr + rpar)).setParseAction(self.pushNext)
+            atom0 = (Optional('[]') + (atomicVal | lpar + atomicVal + rpar).setParseAction(self.pushFirst) | Optional('[]') + (lpar + expr + rpar)).setParseAction(self.pushUAlways)
+            atom1 = (Optional('!') + (atomicVal | lpar + atomicVal + rpar).setParseAction(self.pushFirst) | Optional('!') + (lpar + expr + rpar)).setParseAction(self.pushUNot)
+            atom2 = (Optional('NEXT') + (atomicVal | lpar + atomicVal + rpar).setParseAction(self.pushFirst) | Optional('NEXT') + (lpar + expr + rpar)).setParseAction(self.pushNext)
 
             atoms = atom0 | atom1 | atom2
 
@@ -53,64 +53,65 @@ class CTLParser:
 
     def evaluateStack(self):
         op = self.exprStack.pop()
-        if op == "[]":
-            op1 = "[]" + self.evaluateStack()
+        if op == '[]':
+            op1 = '[]' + self.evaluateStack()
             print op1
             return op1
-        if op == "!":
-            op1 = "!" + self.evaluateStack()
+        if op == '!':
+            op1 = '!' + self.evaluateStack()
             print op1
             return op1
-        if op == "&":
+        if op == '&':
             op1 = self.evaluateStack()
             op2 = self.evaluateStack()
-            print op2 + " " + op + " " + op1
+            print op2 + ' ' + op + ' ' + op1
             return op2 + op1
-        if op == "UNTIL":
+        if op == 'UNTIL':
             op1 = self.evaluateStack()
             op2 = self.evaluateStack()
-            print op2 + " " + op + " " + op1
+            print op2 + ' ' + op + ' ' + op1
             return op2 + op1
-        if op == "TRUE":
-            return "TRUE"
-        if op == "TRUE":
-            return "TRUE"
-        if op in "abcdefghijklmnopqrstuvwxyz":
+        if op == 'TRUE':
+            return 'TRUE'
+        if op == 'TRUE':
+            return 'TRUE'
+        if op in 'abcdefghijklmnopqrstuvwxyz':
             return op
         else:
-            return op + " " + self.evaluateStack()
+            return op + ' ' + self.evaluateStack()
 
     def getParsedFormula(self, formula):
         parser = CTLParser()
         results = parser.CTL().parseString(formula)
         return self.exprStack
 
-if __name__ == "__main__":
+
+if __name__ == '__main__':
 
     def test(s):
         parser = CTLParser()
         results = parser.CTL().parseString(s)
-        print "### stringa di test ###"
+        print '### stringa di test ###'
         print s
-        print "### stack  generato ###"
+        print '### stack  generato ###'
         print parser.exprStack
         val = parser.evaluateStack()
 
-    # test("((a & b) # c) & (>< (d & e))")
-    test("NEXT(TRUE) & (b UNTIL [](!c))")
-    # test("!(a UNTIL b) & k")
-    # test("a")
-    # test( "a & b")
-    # print ""
-    # test( "((a & b) # c) & ([] (d & e))")
-    # print ""
-    # test( "(a & b) # (c # (d # e))")
-    # print ""
-    # test ("!a")
-    # print ""
-    # test ("[](a)")
-    # print ""
+    # test('((a & b) # c) & (>< (d & e))')
+    test('NEXT(TRUE) & (b UNTIL [](!c))')
+    # test('!(a UNTIL b) & k')
+    # test('a')
+    # test( 'a & b')
+    # print ''
+    # test( '((a & b) # c) & ([] (d & e))')
+    # print ''
+    # test( '(a & b) # (c # (d # e))')
+    # print ''
+    # test ('!a')
+    # print ''
+    # test ('[](a)')
+    # print ''
 
-    # test ( "[] (a & !b)")
-    # print ""
-    # test ( "!(a & b)")
+    # test ( '[] (a & !b)')
+    # print ''
+    # test ( '!(a & b)')
