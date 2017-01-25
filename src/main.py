@@ -10,8 +10,8 @@ if __name__ == "__main__":
     nx.draw_networkx_edges(graph,pos,width=2.0,arrows=True,alpha=0.5)
     nx.draw_networkx_labels(graph,pos,font_size=12)
     converter = ENFConverter()
-    # formula = "EE (!(!(a & c & !b) & !(!a & !c & b)))"
-    formula = " FE b"
+    formula = "EE (!(!(a & c & !b) & !(!a & !c & b)))"
+    #formula = " FE b"
     print "Formula: ",formula
     convertedFormula = converter.convert(formula)
     print "Formula in ENF: ", convertedFormula
