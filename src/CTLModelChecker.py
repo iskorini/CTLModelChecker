@@ -4,14 +4,19 @@ from pyparsing import alphas
 from CTLParser import CTLParser
 from ENFConverter import ENFConverter
 
+
 class CTLModelChecker:
 
     __ts = ""
     __formula = ""
     __satisfactionSet = []
     __nodes = []
+
     def __init__(self, tsPath, formula):
-        self.__ts = nx.read_gexf(tsPath,node_type=None, relabel=False, version='1.1draft')
+        ts = nx.read_gexf(
+                tsPath, node_type=None, relabel=False, version='1.1draft'
+            )
+        self.__ts = ts
         self.__nodes = nx.get_node_attributes(self.__ts, 'label')
         self.__formula = CTLParser().getParsedFormula(formula)
 
@@ -42,7 +47,7 @@ class CTLModelChecker:
 
         return (self.__checkInitialStates(satisfactionSet), satisfactionSet[0])
 
-    def __checkInitialStates(self,satSet):
+    def __checkInitialStates(self, satSet):
         initialStates = filter(lambda x: 'S' in x, self.__nodes)
         for state in initialStates:
             if state not in satSet[0]:
@@ -53,7 +58,7 @@ class CTLModelChecker:
         E = list(set(self.__nodes)-set(el0))
         T = el0
         count = dict()
-        for el in el0: #cambiare con map
+        for el in el0:  # cambiare con map
             count[el] = len(self.__ts.successors(el))
         while len(E) > 0:
             s1 = E.pop()
