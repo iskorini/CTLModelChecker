@@ -80,6 +80,9 @@ class ENFConverter:
             op1 = '!(' + self.evaluateStack() + ')'
             # print op1
             return op1
+        if op == 'NEXT':
+            op1 = 'NEXT(' + self.evaluateStack() + ')'
+            return op1
         if op == '&':
             op1 = self.evaluateStack()
             op2 = self.evaluateStack()

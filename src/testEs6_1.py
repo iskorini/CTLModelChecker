@@ -5,13 +5,13 @@ import networkx as nx
 if __name__ == "__main__":
     path = '../inputfiles/filosofi.gefx'
     graph = nx.read_gexf(path)
-    pos = nx.circular_layout(graph, scale=2)
+    pos = nx.spring_layout(graph, scale=2)
     nx.draw_networkx_nodes(graph, pos, node_color='#42f4dc', node_size=600, alpha=0.8)
     nx.draw_networkx_edges(graph, pos, width=2.0, arrows=True, alpha=0.5)
     nx.draw_networkx_labels(graph, pos, font_size=12)
 
     converter = ENFConverter()
-    formula = "[](t UNTIL e)"
+    formula = "FE(!(ehw) & !(eht) & !(ehh) & !(ewt) & !(ewh) & !(eth) & !(etw) & !(ett))"
     print "Formula: ", formula
     convertedFormula = converter.convert(formula)
     print "Formula in ENF: ", convertedFormula

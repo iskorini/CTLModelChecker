@@ -78,7 +78,7 @@ class CTLModelChecker:
             successors = self.__ts.successors(node)
             if len(set(successors).intersection(set(el0))) > 0:
                 tempList.append(node)
-
+        return tempList
     def __checkUntil(self, el0, el1):
         E = el0
         T = E[:]
@@ -105,7 +105,9 @@ class CTLModelChecker:
         return list(set(el0).intersection(el1))
 
     def __checkNot(self, el0):
-        return list(set(self.__nodes.keys()) - set(el0))
+        if el0 is not None:
+            return list(set(self.__nodes) - set(el0))
+        return []
 
     def getTs(self):
         return self.__nodes

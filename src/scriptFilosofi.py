@@ -3,7 +3,7 @@ from xml.etree.ElementTree import Element, SubElement, Comment, tostring, Elemen
 from xml.dom import minidom
 # transizioni da uno stato all altro
 stateTransition = {'t': 'h', 'h': 'w', 'w': 'e', 'e': 't'}
-
+states = {}
 
 def prettify(elem):
     rough_string = tostring(elem)
@@ -14,7 +14,7 @@ def prettify(elem):
 def generateXML(philnumber):
     numeroFilosofi = philnumber
     statoIniziale = "t" * numeroFilosofi
-    states = {}  # dizionario degli stati
+    # states = {}  # dizionario degli stati
     states[statoIniziale] = []  # primo elemento
     stack = []
     stack.append((statoIniziale, numeroFilosofi))
@@ -30,7 +30,7 @@ def generateXML(philnumber):
                 states[nextState[0]] = []
                 # si aggiunge allo stack per trovare i successori
                 stack.append(nextState)
-        print s[0], "forchette disp ", s[1], ":", states[s[0]]
+        #print s[0], "forchette disp ", s[1], ":", states[s[0]]
     top = Element('gefx', attrib={'xmlns': "http://www.gexf.net/1.2draft", 'xmlns:viz': "http://www.gexf.net/1.2draft/viz", 'xmlns:xsi': "http://www.w3.org/2001/XMLSchema-instance", 'xsi:schemaLocation': "http://www.gexf.net/1.2draft http://www.gexf.net/1.2draft/gexf.xsd", 'version': "1.2"})
     graphNode = SubElement(top, 'graph', attrib={'mode': "static", 'defaultedgetype': "directed"})
     nodesNode = SubElement(graphNode, 'nodes')
@@ -74,6 +74,13 @@ def next(state, fork, numeroFilosofi):
             successors.append((tempState.tostring(), tempFork))
     return successors
 
+def generateState(state, posizione):
+    listaStati = []
+    for s in states.keys():
+        if state in s[posizione]:
+            listaStati.append(s)
+    return listaStati
+
 
 def checkEating(state):
     # non possono esserci due filosofi vicini che mangiano
@@ -86,8 +93,8 @@ def checkEating(state):
 
 
 if __name__ == "__main__":
-    generateXML(2)
-
+    generateXML(3)
+    print generateState("e", 0)
     # print "TT ",next("TT" , 2)
     # print "HH ",next("HH" , 2)
     # print "WW ",next("WW" , 0), " caso Deadlock"
