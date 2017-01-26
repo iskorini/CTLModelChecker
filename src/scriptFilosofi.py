@@ -2,16 +2,18 @@ from array import array
 from xml.etree.ElementTree import Element, SubElement, Comment, tostring, ElementTree
 from xml.dom import minidom
 # transizioni da uno stato all altro
-stateTransition = {'T': 'H', 'H': 'W', 'W': 'E', 'E': 'T'}
+stateTransition = {'t': 'h', 'h': 'w', 'w': 'e', 'e': 't'}
+
 
 def prettify(elem):
     rough_string = tostring(elem)
     reparsed = minidom.parseString(rough_string)
     return reparsed.toprettyxml(indent="  ")
 
+
 def generateXML(philnumber):
     numeroFilosofi = philnumber
-    statoIniziale = "T" * numeroFilosofi
+    statoIniziale = "t" * numeroFilosofi
     states = {}  # dizionario degli stati
     states[statoIniziale] = []  # primo elemento
     stack = []
@@ -34,14 +36,15 @@ def generateXML(philnumber):
     edgesNode = SubElement(top, 'edges')
     i = 0
     for nodes in states:
-        singlenode = SubElement(graphNode, 'node', attrib={'id' : nodes, 'label': nodes})
+        singlenode = SubElement(graphNode, 'node', attrib={'id': nodes, 'label': nodes})
         for nextValue in states[nodes]:
-            transition = SubElement(edgesNode, 'edge', attrib={'id': str(i), 'source': nodes, 'target':nextValue})
-            i+=1
+            transition = SubElement(edgesNode, 'edge', attrib={'id': str(i), 'source': nodes, 'target': nextValue})
+            i += 1
     output_file = open('../inputfiles/filosofi.gefx', 'w')
     prettifiedfile = prettify(top)
-    output_file.write(prettifiedfile[15+8:])
+    output_file.write(prettifiedfile[15 + 8:])
     output_file.close()
+
 
 def next(state, fork, numeroFilosofi):
     # lista di tuple che contiene elementi (STATOSUCC, NUMFORK)
@@ -58,11 +61,11 @@ def next(state, fork, numeroFilosofi):
             if binaryI[j] == '1':
                 tempState[j] = stateTransition[state[j]]
                 # le fork diminuiscono se qualcuno passa da H a W e da W a E
-                if 'W' in tempState[j]:
+                if 'w' in tempState[j]:
                     tempFork = tempFork - 1
-                elif 'E' in tempState[j]:
+                elif 'e' in tempState[j]:
                     tempFork = tempFork - 1
-                elif 'T' in tempState[j]:  # da E a T si rilasciano le fork
+                elif 't' in tempState[j]:  # da E a T si rilasciano le fork
                     tempFork = tempFork + 2
         # usando il numero di fork si evita di
         # inserire tuple del tipo ('EEE',-3)
@@ -73,16 +76,16 @@ def next(state, fork, numeroFilosofi):
 
 def checkEating(state):
     # non possono esserci due filosofi vicini che mangiano
-    if 'EE' in state.tostring():
+    if 'ee' in state.tostring():
         return False
     # caso ultimo e primo filosofo che condividono le fork
-    if state[0] == 'E' and state[-1] == 'E':
+    if state[0] == 'e' and state[-1] == 'e':
         return False
     return True
 
 
 if __name__ == "__main__":
-    generateXML(3)
+    generateXML(2)
 
     # print "TT ",next("TT" , 2)
     # print "HH ",next("HH" , 2)

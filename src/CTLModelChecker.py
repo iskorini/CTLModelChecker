@@ -17,6 +17,7 @@ class CTLModelChecker:
         self.__ts = ts
         self.__nodes = nx.get_node_attributes(self.__ts, 'label')
         self.__formula = CTLParser().getParsedFormula(formula)
+        print self.__formula
 
     def iterativeCheckFormula(self):
         satisfactionSet = []
@@ -47,6 +48,8 @@ class CTLModelChecker:
 
     def __checkInitialStates(self, satSet):
         initialStates = filter(lambda x: 'S' in x, self.__nodes)
+        if satSet[0] is None:
+            return False
         for state in initialStates:
             if state not in satSet[0]:
                 return False

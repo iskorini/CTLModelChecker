@@ -1,0 +1,53 @@
+<gefx version="1.2" xmlns="http://www.gexf.net/1.2draft" xmlns:viz="http://www.gexf.net/1.2draft/viz" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.gexf.net/1.2draft http://www.gexf.net/1.2draft/gexf.xsd">
+  <graph defaultedgetype="directed" mode="static">
+  <nodes>
+    <node id="eh" label="eh"/>
+    <node id="tw" label="tw"/>
+    <node id="Stt" label="tt"/>
+    <node id="hw" label="hw"/>
+    <node id="ht" label="ht"/>
+    <node id="wh" label="wh"/>
+    <node id="ww" label="ww"/>
+    <node id="hh" label="hh"/>
+    <node id="wt" label="wt"/>
+    <node id="th" label="th"/>
+    <node id="et" label="et"/>
+    <node id="te" label="te"/>
+    <node id="he" label="he"/>
+  </nodes>
+  <edges>
+    <edge id="0" source="eh" target="th"/>
+    <edge id="1" source="eh" target="tw"/>
+    <edge id="2" source="tw" target="te"/>
+    <edge id="3" source="tw" target="hw"/>
+    <edge id="4" source="tw" target="he"/>
+    <edge id="5" source="Stt" target="th"/>
+    <edge id="6" source="Stt" target="ht"/>
+    <edge id="7" source="Stt" target="hh"/>
+    <edge id="8" source="hw" target="he"/>
+    <edge id="9" source="hw" target="ww"/>
+    <edge id="10" source="ht" target="hh"/>
+    <edge id="11" source="ht" target="wt"/>
+    <edge id="12" source="ht" target="wh"/>
+    <edge id="13" source="wh" target="ww"/>
+    <edge id="14" source="wh" target="eh"/>
+    <edge id="15" source="hh" target="hw"/>
+    <edge id="16" source="hh" target="wh"/>
+    <edge id="17" source="hh" target="ww"/>
+    <edge id="18" source="wt" target="wh"/>
+    <edge id="19" source="wt" target="et"/>
+    <edge id="20" source="wt" target="eh"/>
+    <edge id="21" source="th" target="tw"/>
+    <edge id="22" source="th" target="hh"/>
+    <edge id="23" source="th" target="hw"/>
+    <edge id="24" source="et" target="eh"/>
+    <edge id="25" source="et" target="Stt"/>
+    <edge id="26" source="et" target="th"/>
+    <edge id="27" source="te" target="Stt"/>
+    <edge id="28" source="te" target="he"/>
+    <edge id="29" source="te" target="ht"/>
+    <edge id="30" source="he" target="ht"/>
+    <edge id="31" source="he" target="wt"/>
+  </edges>
+  </graph>
+</gefx>

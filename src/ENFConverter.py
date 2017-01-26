@@ -43,7 +43,7 @@ class ENFConverter:
     def ENF(self):
         global bnf
         if not bnf:
-            atomicVal = Word('abcdefghijklmnopqrstuvwxyz') | 'TRUE'
+            atomicVal = Word('abcdefghijklmnopqrstuvwxyz', max=10) | 'TRUE'
             lpar = Literal('(').suppress()
             rpar = Literal(')').suppress()
             notOp = Literal('!')
@@ -114,10 +114,8 @@ class ENFConverter:
             return op1
         if op == 'TRUE':
             return 'TRUE'
-        if op in 'abcdefghijklmnopqrstuvwxyz':
-            return op
         else:
-            return op + ' ' + self.evaluateStack()
+            return op
 
     def getStack(self):
         return self.exprStack
