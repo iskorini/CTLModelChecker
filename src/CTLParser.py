@@ -27,7 +27,7 @@ class CTLParser:
     def CTL(self):
         global bnf
         if not bnf:
-            atomicVal = Word(srange("[a-z0-9]"), max=10) |'TRUE'
+            atomicVal = Word(srange("[a-z0-9]"), max=10) | 'TRUE'
             lpar = Literal('(').suppress()
             rpar = Literal(')').suppress()
             notOp = Literal('!')
