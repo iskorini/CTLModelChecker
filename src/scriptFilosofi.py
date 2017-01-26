@@ -33,10 +33,11 @@ def generateXML(philnumber):
         print s[0], "forchette disp ", s[1], ":", states[s[0]]
     top = Element('gefx', attrib={'xmlns': "http://www.gexf.net/1.2draft", 'xmlns:viz': "http://www.gexf.net/1.2draft/viz", 'xmlns:xsi': "http://www.w3.org/2001/XMLSchema-instance", 'xsi:schemaLocation': "http://www.gexf.net/1.2draft http://www.gexf.net/1.2draft/gexf.xsd", 'version': "1.2"})
     graphNode = SubElement(top, 'graph', attrib={'mode': "static", 'defaultedgetype': "directed"})
-    edgesNode = SubElement(top, 'edges')
+    nodesNode = SubElement(graphNode, 'nodes')
+    edgesNode = SubElement(graphNode, 'edges')
     i = 0
     for nodes in states:
-        singlenode = SubElement(graphNode, 'node', attrib={'id': nodes, 'label': nodes})
+        singlenode = SubElement(nodesNode, 'node', attrib={'id': nodes, 'label': nodes})
         for nextValue in states[nodes]:
             transition = SubElement(edgesNode, 'edge', attrib={'id': str(i), 'source': nodes, 'target': nextValue})
             i += 1
