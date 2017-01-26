@@ -13,7 +13,9 @@ def prettify(elem):
 
 def generateXML(philnumber):
     numeroFilosofi = philnumber
-    statoIniziale = "t" * numeroFilosofi
+    statoIniziale = ""
+    for i in range(numeroFilosofi):
+        statoIniziale += "t" + str(i)
     # states = {}  # dizionario degli stati
     states[statoIniziale] = []  # primo elemento
     stack = []
@@ -30,18 +32,28 @@ def generateXML(philnumber):
                 states[nextState[0]] = []
                 # si aggiunge allo stack per trovare i successori
                 stack.append(nextState)
-        #print s[0], "forchette disp ", s[1], ":", states[s[0]]
-    top = Element('gefx', attrib={'xmlns': "http://www.gexf.net/1.2draft", 'xmlns:viz': "http://www.gexf.net/1.2draft/viz", 'xmlns:xsi': "http://www.w3.org/2001/XMLSchema-instance", 'xsi:schemaLocation': "http://www.gexf.net/1.2draft http://www.gexf.net/1.2draft/gexf.xsd", 'version': "1.2"})
+        print s[0], "forchette disp ", s[1], ":", states[s[0]]
+    top = Element('gexf', attrib={'xmlns': "http://www.gexf.net/1.2draft", 'xmlns:viz': "http://www.gexf.net/1.2draft/viz", 'xmlns:xsi': "http://www.w3.org/2001/XMLSchema-instance", 'xsi:schemaLocation': "http://www.gexf.net/1.2draft http://www.gexf.net/1.2draft/gexf.xsd", 'version': "1.2"})
     graphNode = SubElement(top, 'graph', attrib={'mode': "static", 'defaultedgetype': "directed"})
     nodesNode = SubElement(graphNode, 'nodes')
     edgesNode = SubElement(graphNode, 'edges')
     i = 0
+    singlenode = SubElement(nodesNode, 'node', attrib={'id': 'S' + statoIniziale, 'label': statoIniziale})
+    for nextValue in states[statoIniziale]:
+        transition = SubElement(edgesNode, 'edge', attrib={'id': str(i), 'source': 'S' + statoIniziale, 'target': nextValue})
+        i += 1
+    states.pop(statoIniziale)
     for nodes in states:
         singlenode = SubElement(nodesNode, 'node', attrib={'id': nodes, 'label': nodes})
+        if states[nodes] == []:
+            transition = SubElement(edgesNode, 'edge', attrib={'id': str(i), 'source': nodes, 'target': nodes})
         for nextValue in states[nodes]:
-            transition = SubElement(edgesNode, 'edge', attrib={'id': str(i), 'source': nodes, 'target': nextValue})
+            if nextValue == statoIniziale:
+                transition = SubElement(edgesNode, 'edge', attrib={'id': str(i), 'source': nodes, 'target': 'S' + nextValue})
+            else:
+                transition = SubElement(edgesNode, 'edge', attrib={'id': str(i), 'source': nodes, 'target': nextValue})
             i += 1
-    output_file = open('../inputfiles/filosofi.gefx', 'w')
+    output_file = open('../inputfiles/filosofi.gexf', 'w')
     prettifiedfile = prettify(top)
     output_file.write(prettifiedfile[15 + 8:])
     output_file.close()
@@ -56,23 +68,24 @@ def next(state, fork, numeroFilosofi):
         tempFork = fork
         # uso i numeri binari per generare i possibili stati successivi
         binaryI = bin(i)[2:].zfill(numeroFilosofi)
-        for j in range(0, len(state)):
+        for j in range(0, (len(state) / 2)):
             # se nella posizione j del binario c e 1
             # allora si fa una transizione
             if binaryI[j] == '1':
-                tempState[j] = stateTransition[state[j]]
+                tempState[j * 2] = stateTransition[state[j * 2]]
                 # le fork diminuiscono se qualcuno passa da H a W e da W a E
-                if 'w' in tempState[j]:
+                if 'w' in tempState[j * 2]:
                     tempFork = tempFork - 1
-                elif 'e' in tempState[j]:
+                elif 'e' in tempState[j * 2]:
                     tempFork = tempFork - 1
-                elif 't' in tempState[j]:  # da E a T si rilasciano le fork
+                elif 't' in tempState[j * 2]:  # da E a T si rilasciano le fork
                     tempFork = tempFork + 2
         # usando il numero di fork si evita di
         # inserire tuple del tipo ('EEE',-3)
         if tempFork >= 0 and checkEating(tempState):
             successors.append((tempState.tostring(), tempFork))
     return successors
+
 
 def generateState(state, posizione):
     listaStati = []
@@ -93,8 +106,9 @@ def checkEating(state):
 
 
 if __name__ == "__main__":
-    generateXML(3)
-    print generateState("e", 0)
+    # print next("t1t2",2,2)
+    generateXML(2)
+    # print generateState("e", 0)
     # print "TT ",next("TT" , 2)
     # print "HH ",next("HH" , 2)
     # print "WW ",next("WW" , 0), " caso Deadlock"
