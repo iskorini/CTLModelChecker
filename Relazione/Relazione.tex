@@ -292,8 +292,17 @@ Per un \acf{TS} con N stati e K transizioni, ed una formula CTL $\phi$, il probl
 La complessità in tempo di questo algoritmo è determinata come segue. Sia \ac{TS} un \acf{TS} finito con N stati e K transizioni. Sotto l'assunzione che l'insieme di predecessori di uno stato sono rappresentati da una \textit{Linked List}, la complessità degli Algoritmi \ref{alg:always} e \ref{alg:until} sono $O(N+K)$. Visto che la computazione del $Sat(\phi)$ viene effettuata in una maniera \textit{bottom-up} la complssità risulta lineare nella dimensione della formula, quindi la complessità dell'algoritmo \ref{alg:base} è data da $$O((N+K) \cdot |\phi|) $$
 \end{proof}
 Va però ricordato che l'algoritmo proposto lavora con formule in \ac{ENF}, il che può portare ad una crescita esponenziale della dimensione della formula. Fortunatamente però esistono algoritmi per calcolare gli insiemi di stati soddisfatti per formule non in ENF, che hanno complessità $O(N+K)$.
-\section{Model Checker in Python per \ac{CTL}}
 
+\section{Model Checker in Python per \ac{CTL}}
+Il programma è stato realizzato utilizzando Python con l'ausilio delle librerie \texttt{pyparser} e \texttt{networkx}. La prima libreria è stata usata per definire la grammatica di \ac{CTL} ed effettuare il parsing di una formula passata in input come una stringa.
+La seconda libreria è stata invece utilizzata per la rappresentazione dei \ac{TS}. Questa libreria contiene molte funzioni che si sono rivelate essenziali durante lo sviluppo del model checker, come per esempio la possibilità di ottenere liste di predecessori e successori di uno stato con una sola riga di codice.
+\subsection{Come vengono rappresentati i \ac{TS}}
+I \acf{TS} vengono rappresentati come dei semplici grafi.
+\begin{theor}
+Dato un \acf{TS} = $\{S, Act, \rightarrow, I, AP, L\}$ si considera il grafo sottostante $G = (V,E)$ tale che $V = S$ e $E = \{ (s, s')\ |\ (s, \alpha, s') \in \rightarrow\  per\ un\ qualsiasi\ \alpha \in ACT\}$
+\end{theor}
+\subsection{Come vengono rappresentate le formule}
+\subsection{Gli algoritmi di model checking} 
 \section{Esempi di utilizzo del Model Checker di \ac{CTL} in Python}
 
 \begin{acronym}
