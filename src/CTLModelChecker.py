@@ -62,7 +62,7 @@ class CTLModelChecker:
         for el in el0:  # cambiare con map
             count[el] = len(self.__ts.successors(el))
         while len(E) > 0:
-            s1 = E.pop()ì
+            s1 = E.pop()
             s1Preset = self.__ts.predecessors(s1)
             for s1pre in s1Preset:
                 if s1pre in T:
