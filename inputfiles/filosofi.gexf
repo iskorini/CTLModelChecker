@@ -1,0 +1,54 @@
+<gexf version="1.2" xmlns="http://www.gexf.net/1.2draft" xmlns:viz="http://www.gexf.net/1.2draft/viz" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.gexf.net/1.2draft http://www.gexf.net/1.2draft/gexf.xsd">
+  <graph defaultedgetype="directed" mode="static">
+    <nodes>
+      <node id="St0t1" label="t0t1"/>
+      <node id="h0e1" label="h0e1"/>
+      <node id="h0t1" label="h0t1"/>
+      <node id="e0h1" label="e0h1"/>
+      <node id="t0w1" label="t0w1"/>
+      <node id="w0w1" label="w0w1"/>
+      <node id="e0t1" label="e0t1"/>
+      <node id="w0h1" label="w0h1"/>
+      <node id="t0h1" label="t0h1"/>
+      <node id="w0t1" label="w0t1"/>
+      <node id="t0e1" label="t0e1"/>
+      <node id="h0w1" label="h0w1"/>
+      <node id="h0h1" label="h0h1"/>
+    </nodes>
+    <edges>
+      <edge id="0" source="St0t1" target="t0h1"/>
+      <edge id="1" source="St0t1" target="h0t1"/>
+      <edge id="2" source="St0t1" target="h0h1"/>
+      <edge id="3" source="h0e1" target="h0t1"/>
+      <edge id="4" source="h0e1" target="w0t1"/>
+      <edge id="5" source="h0t1" target="h0h1"/>
+      <edge id="6" source="h0t1" target="w0t1"/>
+      <edge id="7" source="h0t1" target="w0h1"/>
+      <edge id="8" source="e0h1" target="t0h1"/>
+      <edge id="9" source="e0h1" target="t0w1"/>
+      <edge id="10" source="t0w1" target="t0e1"/>
+      <edge id="11" source="t0w1" target="h0w1"/>
+      <edge id="12" source="t0w1" target="h0e1"/>
+      <edge id="13" source="w0w1" target="w0w1"/>
+      <edge id="13" source="e0t1" target="e0h1"/>
+      <edge id="14" source="e0t1" target="St0t1"/>
+      <edge id="15" source="e0t1" target="t0h1"/>
+      <edge id="16" source="w0h1" target="w0w1"/>
+      <edge id="17" source="w0h1" target="e0h1"/>
+      <edge id="18" source="t0h1" target="t0w1"/>
+      <edge id="19" source="t0h1" target="h0h1"/>
+      <edge id="20" source="t0h1" target="h0w1"/>
+      <edge id="21" source="w0t1" target="w0h1"/>
+      <edge id="22" source="w0t1" target="e0t1"/>
+      <edge id="23" source="w0t1" target="e0h1"/>
+      <edge id="24" source="t0e1" target="St0t1"/>
+      <edge id="25" source="t0e1" target="h0e1"/>
+      <edge id="26" source="t0e1" target="h0t1"/>
+      <edge id="27" source="h0w1" target="h0e1"/>
+      <edge id="28" source="h0w1" target="w0w1"/>
+      <edge id="29" source="h0h1" target="h0w1"/>
+      <edge id="30" source="h0h1" target="w0h1"/>
+      <edge id="31" source="h0h1" target="w0w1"/>
+    </edges>
+  </graph>
+</gexf>
