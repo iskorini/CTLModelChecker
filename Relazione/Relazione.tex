@@ -12,6 +12,7 @@
 \usepackage{syntax}
 \usepackage{newfloat}
 \usepackage{float}
+\usepackage{listings}
 %\usepackage[LGRgreek]{mathastext}
 \usepackage[osf,sc]{mathpazo}
 \usepackage{eulervm}
@@ -19,6 +20,7 @@
 \usepackage{listings}
 \usepackage{caption}
 \usepackage{color}
+\usepackage{xcolor}
 \usepackage{algorithm}% http://ctan.org/pkg/algorithms
 \usepackage{algpseudocode}% http://ctan.org/pkg/algorithmicx
 
@@ -50,10 +52,30 @@
 \newalgname{Algoritmo}% All algorithms will be called "Algorithme"
 \renewcommand{\listalgorithmname}{Lista di \ALG@name s}
 \makeatother
-
+\renewcommand{\lstlistingname}{Codice}
+\renewcommand{\lstlistlistingname}{Lista di codici}
 
 
 \begin{document}
+\lstdefinestyle{customXML}{
+    language=xml,
+    tabsize=2,
+    frame=lines,
+    label=code:sample,
+    frame=shadowbox,
+    rulesepcolor=\color{gray},
+    xleftmargin=10pt,
+    framexleftmargin=15pt,
+    keywordstyle=\color{blue}\bf,
+    commentstyle=\color{OliveGreen},
+    stringstyle=\color{red},
+    numbers=left,
+    numberstyle=\tiny,
+    numbersep=5pt,
+    breaklines=true,
+    showstringspaces=false,
+    basicstyle=\footnotesize,
+    emph={food,name,price},emphstyle={\color{magenta}}}
 \maketitle
 \tableofcontents
 \section{Introduzione a \ac*{CTL}}
@@ -230,7 +252,7 @@ Per l'operatore Until $\boldsymbol{U}$ la \eqref{eq:te6} del Teorema \ref{eq:teo
 \end{algorithm}
 L'Algoritmo \ref{alg:until} parte calcolando tutti gli stati che soddisfano $\Psi$, che vengono poi copiati in due insiemi: $E$ e $T$. Successivamente parte un ciclo che effettua una ricerca andando ad analizzare i predecessori degli stati. In questo ciclo viene preso un elemento $s'$ dall'insieme $E$ e ne vengono analizzati i predecessori. Se uno stato $s$ appartiene a  $Pre(s') \backslash T$ allora viene inserito in $E$ ed in $T$. Alla fine l'insieme T conterrà tutti gli stati che soddisfano la formula  $\exists(\phi \boldsymbol{U} \Psi)$.\par
 L'algoritmo per calcolare $Sat(\exists \square \phi)$ sfrutta la caratterizzazione fornita da \ref{eq:te7}. L'idea base è computare $Sat(\exists \square \phi)$ iterativamente in questo modo:
-$$T_{0} = Sat(\phi)\ e \ T_{i+1} = T_{i} \cap \{s \in Sat(\phi | Post(s) \cap T_{i} \neq \emptyset)$$
+$$T_{0} = Sat(\phi)\ e \ T_{i+1} = T_{i} \cap \{s \in Sat(\phi)\  |\ Post(s) \cap T_{i} \neq \emptyset\}$$
 \begin{algorithm}
 \label{alg:always}
 \caption{Algoritmo per $Sat(\exists \square \phi)$}
@@ -297,11 +319,18 @@ Va però ricordato che l'algoritmo proposto lavora con formule in \ac{ENF}, il c
 Il programma è stato realizzato utilizzando Python con l'ausilio delle librerie \texttt{pyparser} e \texttt{networkx}. La prima libreria è stata usata per definire la grammatica di \ac{CTL} ed effettuare il parsing di una formula passata in input come una stringa.
 La seconda libreria è stata invece utilizzata per la rappresentazione dei \ac{TS}. Questa libreria contiene molte funzioni che si sono rivelate essenziali durante lo sviluppo del model checker, come per esempio la possibilità di ottenere liste di predecessori e successori di uno stato con una sola riga di codice.
 \subsection{Come vengono rappresentati i \ac{TS}}
-I \acf{TS} vengono rappresentati come dei semplici grafi.
-\begin{theor}
-Dato un \acf{TS} = $\{S, Act, \rightarrow, I, AP, L\}$ si considera il grafo sottostante $G = (V,E)$ tale che $V = S$ e $E = \{ (s, s')\ |\ (s, \alpha, s') \in \rightarrow\  per\ un\ qualsiasi\ \alpha \in ACT\}$
-\end{theor}
+Un \acf{TS} viene rappresentato come un grafo $G$ dove i nodi sono gli stati del \ac{TS} e gli archi sono rappresentati dagli archi del \ac{TS}. Più formalmente:
+\begin{defn}
+Dato un \acf{TS} = $\{S, Act, \rightarrow, I, AP, L\}$ si considera il grafo sottostante $G = (V,E)$ tale che $V = S$ e $E = \{ (s, s')\ \in S x S|\ s' \in Post(s)\}$
+\end{defn}
+Grazie alla libreria \href{https://networkx.github.io}{\texttt{networkx}} è possibile leggere un grafo da un file \ac{XML} in linguaggio \href{https://gephi.org/gexf/format/}{\ac{GEXF}}.
+\ac{GEXF} è un linguaggio usato per la definizione di strutture complesse, come grafi, in maniera semplice. Un esempio di grafo in \ac{GEXF} è mostrato in Codice~\ref{code:esgrafo}. Questo grafo è di tipo diretto ed è formato da due nodi e un arco che li collega, il primo nodo ha label \texttt{Hello} ed il secondo ha label \texttt{World}.
+
+\lstinputlisting[style=customXML, caption = Esempio di grafo rappresentato in XML, label = {code:esgrafo}]{CodiceRelazione/esempiografo.xml}
+
 \subsection{Come vengono rappresentate le formule}
+\subsubsection{Il parsing della formula}
+\subsubsection{La conversione in ENF}
 \subsection{Gli algoritmi di model checking} 
 \section{Esempi di utilizzo del Model Checker di \ac{CTL} in Python}
 
@@ -310,6 +339,8 @@ Dato un \acf{TS} = $\{S, Act, \rightarrow, I, AP, L\}$ si considera il grafo sot
 \acro{LTL}{Linear Temporal Logic}
 \acro{TS}{Transition System}
 \acro{ENF}{Existential Normal Form}
+\acro{XML}{eXtensible Markup Language}
+\acro{GEXF}{Graph Exchange \ac{XML} Format}
 \end{acronym}
 
 \end{document}
