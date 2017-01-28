@@ -59,7 +59,7 @@ class CTLModelChecker:
         E = list(set(self.__nodes) - set(el0))
         T = el0
         count = dict()
-        for el in el0:  # cambiare con map
+        for el in el0:  
             count[el] = len(self.__ts.successors(el))
         while len(E) > 0:
             s1 = E.pop()
@@ -114,10 +114,3 @@ class CTLModelChecker:
 
     def getFormulaStack(self):
         return self.__formula
-
-
-if __name__ == '__main__':
-    args = sys.argv
-    convertedFormula = ENFConverter().convert(args[1])
-    modelChecker = CTLModelChecker(args[2], convertedFormula)
-    print modelChecker.iterativeCheckFormula()

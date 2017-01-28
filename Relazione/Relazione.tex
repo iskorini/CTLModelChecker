@@ -20,7 +20,7 @@
 \usepackage{listings}
 \usepackage{caption}
 \usepackage{color}
-\usepackage{xcolor}
+\usepackage[dvipsnames]{xcolor}
 \usepackage{algorithm}% http://ctan.org/pkg/algorithms
 \usepackage{algpseudocode}% http://ctan.org/pkg/algorithmicx
 
@@ -59,6 +59,25 @@
 \begin{document}
 \lstdefinestyle{customXML}{
     language=xml,
+    tabsize=2,
+    frame=lines,
+    label=code:sample,
+    frame=shadowbox,
+    rulesepcolor=\color{gray},
+    xleftmargin=10pt,
+    framexleftmargin=15pt,
+    keywordstyle=\color{blue}\bf,
+    commentstyle=\color{OliveGreen},
+    stringstyle=\color{red},
+    numbers=left,
+    numberstyle=\tiny,
+    numbersep=5pt,
+    breaklines=true,
+    showstringspaces=false,
+    basicstyle=\footnotesize,
+    emph={food,name,price},emphstyle={\color{magenta}}}
+\lstdefinestyle{customPY}{
+    language=Python,
     tabsize=2,
     frame=lines,
     label=code:sample,
@@ -165,8 +184,8 @@ $$\forall\bigcircle \phi \equiv \neg \exists \bigcircle \neg \phi$$
 $$\forall(\phi \boldsymbol{U} \Psi) \equiv \neg \exists( \Psi \boldsymbol{U} (\neg \phi \wedge \Psi)  )\wedge \neg\exists\neq\Psi$$
 \end{proof}
 \begin{algorithm}
-\label{alg:base}
 \caption{Algoritmo di model checking base per \ac{CTL}}
+\label{alg:base}
 \begin{algorithmic}[1]
 \Procedure{CTLModelChecking}{$TS, \phi$}
 \ForAll{$i \leq |\phi|$}
@@ -230,8 +249,8 @@ Le caratterizzazioni fornite dal Teorema \ref{eq:teoremaCaratterizzazione} forni
 Per l'operatore Until $\boldsymbol{U}$ la \eqref{eq:te6} del Teorema \ref{eq:teoremaCaratterizzazione} suggerisce di usare una procedura iterativa tale per cui $T_{0} = Sat(\Psi)$ e $T_{i+1} = T_{i} \cup \{s \in Sat{\phi} | Post(s) \cap T_{i} \neq \emptyset \}$. L'insieme $T_{i}$ contiene tutti gli stati che possono raggiungere uno stato $s \in Sat{\Psi}$ in $i$ passi attraverso path che passano per stati $s^{1} \in Sat{\psi}$.
 
 \begin{algorithm}
-\label{alg:until}
 \caption{Algoritmo per $Sat(\exists(\phi \boldsymbol{U} \Psi)$)}
+\label{alg:until}
 \begin{algorithmic}[1]
 \Procedure{ComputeExistsUntil}{$TS, \phi \boldsymbol{U} \Psi$}
 \State E $:= Sat(\Psi)$
@@ -254,8 +273,8 @@ L'Algoritmo \ref{alg:until} parte calcolando tutti gli stati che soddisfano $\Ps
 L'algoritmo per calcolare $Sat(\exists \square \phi)$ sfrutta la caratterizzazione fornita da \ref{eq:te7}. L'idea base è computare $Sat(\exists \square \phi)$ iterativamente in questo modo:
 $$T_{0} = Sat(\phi)\ e \ T_{i+1} = T_{i} \cap \{s \in Sat(\phi)\  |\ Post(s) \cap T_{i} \neq \emptyset\}$$
 \begin{algorithm}
-\label{alg:always}
 \caption{Algoritmo per $Sat(\exists \square \phi)$}
+\label{alg:always}
 \begin{algorithmic}[1]
 \Procedure{ComputeExistsAlways}{$TS, (\exists \square \phi)$}
 \State E $:= S \backslash Sat(\phi)$
@@ -328,12 +347,60 @@ Grazie alla libreria \href{https://networkx.github.io}{\texttt{networkx}} è pos
 
 \lstinputlisting[style=customXML, caption = Esempio di grafo rappresentato in XML, label = {code:esgrafo}]{CodiceRelazione/esempiografo.xml}
 
+Per leggere il grafo in Python sono sufficienti poche righe di codice, mostrate in Codice~\ref{code:letturagrafo}.
+\lstinputlisting[style=customPY, caption = Lettura di un file \ac{GEXF}, label = {code:letturagrafo}]{CodiceRelazione/letturagrafo.py}
+\par
+Un \ac{TS} è rappresentato da un nodo principale \texttt{graph} con attributi \texttt{mode} impostato a \texttt{static} e \texttt{defaultedgetype} impostato a \texttt{directed}. A sua volta questo nodo conterrà due nodi figli chiamati \texttt{nodes} e \texttt{edges}, che conterranno a loro volta una lista di nodi e di archi.
+Uno stato di un \ac{TS} viene rappresentato assegnando, nel file \ac{GEXF} un figlio \texttt{node} al padre \texttt{nodes}, con attributo \texttt{id} scelto arbitrariamente e attributo \texttt{label} contenente le proposizioni atomiche che sono soddisfatte dallo stato considerato. Per rappresentare uno stato iniziale del \ac{TS} è sufficiente anteporre al \texttt{id} dello stato una \texttt{S}.
+Un arco è semplicemente rappresentato da un figlio \texttt{edge} del nodo padre \texttt{edges}. Gli attributi di un nodo \texttt{edges} sono \texttt{id}, \texttt{target} e \texttt{source}. L'identificativo può essere scelto aribitrariamente, mentre \texttt{target} e \texttt{source} sono rispettivamnete la destinazione e la sorgente dell'arco.
+
 \subsection{Come vengono rappresentate le formule}
 \subsubsection{Il parsing della formula}
+\label{subsub:parsingformula}
 \subsubsection{La conversione in ENF}
-\subsection{Gli algoritmi di model checking} 
-\section{Esempi di utilizzo del Model Checker di \ac{CTL} in Python}
 
+\subsection{Gli algoritmi di model checking} 
+Il model checker vero e proprio è definito come una classe in python, che per essere istanziata necessita di un \ac{TS} e di una formula \ac{CTL} in ENF. Quindi in fase di costruzione si occuperà di leggere il file \ac{GEXF} e convertire la formula in notazione postfissa, memorizzandola in uno stack, come descritto in Sottosezione \ref{subsub:parsingformula}.\par
+Una volta creata l'istanza della classe \texttt{CTLModelChecker} è necessario chiamare la funzione mostrata in Codice~\ref{code:basefunction}, che rappresenta una possibile implementazione dell'Algoritmo \ref{alg:base}.
+\lstinputlisting[firstline = 22, lastline = 47, style=customPY, caption = Funzione che effettua il model checking base, label = {code:basefunction}]{CodiceRelazione/modelchecker.py}
+Questa funzione scorre iterativamente la formula effettuando diverse operazioni in base all'elemento analizzato, effettuandone così la valutazione.
+Il caso base è quando viene analizzato un singoletto, ovvero una singola proposizione senza operatori logici. In questo caso viene richiamato il metodo \texttt{__checkSingle()}, mostrato in Codice~\ref{code:checksingle}, il quale ritornerà un insieme di stati che soddisfano il singoletto. Questo insieme sarà aggiunto ad una pila temporanea, che alla fine conterrà come singolo elemento solamente l'insieme di stati che soddisfano la formula data in input.
+\lstinputlisting[firstline = 97, lastline = 102, style = customPY, caption = Funzione per il calcolo dell'insieme di soddisfacibilità di una singola proposizione, label = {code:checksingle}]{CodiceRelazione/modelchecker.py}
+Il compito di questo metodo è molto semplice, itera la lista dei nodi e verifica se la proposizione atomica in questione è presente all'interno dell'attributo \texttt{label} del nodo preso in considerazione.\par
+Se durante la valutazione della formula si incorre in un operatore bisogna estrarre dalla pila uno, o due insiemi di stati soddisfatti ed effettuare l'operazione. L'operatore più semplice da gestire è il NOT, in quanto, come mostrato in Codice~\ref{code:not} è sufficiente sottrarre a tutti gli stati del \ac{TS} gli stati passati in input alla funzione \texttt{__checkNot()}.
+\lstinputlisting[firstline = 107, lastline = 110, style = customPY, caption = Funzione per il calcolo del NOT, label = {code:not}]{CodiceRelazione/modelchecker.py}
+Il calcolo dell'AND richiede due insiemi di stati, che saranno estratti dalla pila e passati in input alla funzione mostrata in Codice~\ref{code:and}. Questa funzione trasforma in oggetti di tipo \texttt{set} le due liste passate in input, ne effettua l'intersezione e le ritorna sottoforma di lista.
+\lstinputlisting[firstline = 104, lastline = 105, style = customPY, caption = Funzione per il calcolo del AND, label = {code:and}]{CodiceRelazione/modelchecker.py}
+L'operatore $\bigcircle$ richiede solamente una lista di stati e iterando sulla lista dei nodi effettua l'operazione di intersezione tra i successori del nodo preso in considerazione e la lista di stati passata in input. Se la dimensione dell'insieme risultante è maggiore di 0 allora il nodo verrà aggiunto alla lista di stati che soddisfa la formula per cui è stato chiamato il metodo. L'implementazione di questa funzione è mostrata in Codice~\ref{code:next}.
+\lstinputlisting[firstline = 75, lastline = 81, style = customPY, caption = Funzione per il calcolo del NEXT, label = {code:next}]{CodiceRelazione/modelchecker.py}
+
+Nel caso in cui si incorre nell'operatore $\square$ viene richiamato il metodo \texttt{__checkAlways()}, che prende in input una singola lista di stati. Questo metodo è una implementazione dell'Algoritmo \ref{alg:always} ed è mostrato in Codice~\ref{code:always}
+\lstinputlisting[firstline = 58, lastline = 73, style = customPY, caption = Funzione per il calcolo del ALWAYS, label = {code:always}]{CodiceRelazione/modelchecker.py}
+Per l'operatore $\boldsymbol{U}$ è stato implementato l'Algoritmo \ref{alg:until}, mostrato in Codice~\ref{code:until}.
+\lstinputlisting[firstline = 82, lastline = 92, style = customPY, caption = Funzione per il calcolo del UNTIL, label = {code:until}]{CodiceRelazione/modelchecker.py}
+L'ultima operazione effettuata dall'Algoritmo \ref{alg:base} è verificare se gli stati iniziali sono un sottoinsieme degli stati soddisfatti dalla formula. Il Codice \ref{code:basefunction} effettua questa operazione alla riga 26.
+\subsection{Una versione migliorata del Model Checker}
+Con lo scopo di migliorare le prestazioni dell'algoritmo di Model Checking è stata sviluppata un'ulteriore versione che fa uso di una tecnica di caching. Usando questa tecnica ad ogni passo viene memorizzato in un dizionario il risultato delle sottoformule valutate. In questo modo, se la formula contiene più sottoformule uguali non è necessario rivalutarle ogni volta, ma basta accedere al dizionario per prenderne il risultato.
+Per realizzare questa ottimizzazione è stato inserito un dizionario all'interno della classe, ed il metodo \texttt{iterativeCheckFormula} mostrato in Codice \ref{code:basefunction} è stato modificato. Il nuovo metodo \texttt{iterativeCheckFormula} per ogni elemento dello stack verifica prima se è già stato valutato effettuando un accesso nel dizionario. Nel caso in cui sia già stato valutato non effettua una chiamata al metodo che si occupa della valutazione, ma aggiunge alla pila degli stati soddisfatti l'elemento corrispondente del dizionario. L'implementazione di questa funzione è mostrata in Codice~\ref{code:basecache}.
+\lstinputlisting[firstline = 24, lastline = 66, style = customPY, caption = Funzione per il model checking base ottimizzata con la tecnica del caching, label = {code:basecache}]{CodiceRelazione/modelcheckercaching.py}
+\section{Esempi di utilizzo del Model Checker di \ac{CTL} in Python}
+Per provare il model checker è stato inoltre sviluppato un piccolo script Python che costruisce il \ac{TS} che modella il problema dei filosofi a cena. Questo script, dato in input un intero $n$ restituisce il \ac{GEXF} che rappresenta il \ac{TS} con $n$ filosofi.
+Le proposizioni atomiche del \ac{TS} generato sono: 
+$$AP = \{e_0, \dots, e_n, t_0, \dots, t_n, h_0, \dots, h_n, w_0, \dots, w_n \}$$
+che rappresentano gli stati possibili in cui si può trovare ognuno degli $n$ filosofi:
+\begin{itemize}
+  \item{$t_0 \dots t_n$ rappresentano le proposizioni atomiche dove il filosofo è nello stato "thinking", cioè quando non è in attesa di niente}
+  \item{$h_0 \dots h_n$ rappresentano le proposizioni atomiche dove il filosofo è nello stato "hungry", ovvero quando richiede la prima forchetta}
+  \item{$w_0 \dots w_n$ rappresentano le proposizioni atomiche dove il filosofo è nello stato "wait", ovvero quando è in attesa della seconda forchetta}
+  \item{$e_0 \dots e_n$ rappresenta le prooposizioni atomiche dove il filosofo è nello stato "eating", ovvero quando mangia}
+\end{itemize}
+Lo stato iniziale del \ac{TS} generato sarà lo stato che conterrà come label l'insieme $\{t_0 \dots t_n\}$, cioè quando tutti i filosofi sono nello stato di "thinking".
+
+
+
+
+
+%sistemare gli acronimi in una sezione
 \begin{acronym}
 \acro{CTL}{Computational Tree Logic}
 \acro{LTL}{Linear Temporal Logic}
@@ -344,11 +411,6 @@ Grazie alla libreria \href{https://networkx.github.io}{\texttt{networkx}} è pos
 \end{acronym}
 
 \end{document}
-
-
-
-
-
 
 
 
