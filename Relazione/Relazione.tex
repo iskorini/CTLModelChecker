@@ -355,7 +355,7 @@ Uno stato di un \ac{TS} viene rappresentato assegnando, nel file \ac{GEXF} un fi
 Un arco è semplicemente rappresentato da un figlio \texttt{edge} del nodo padre \texttt{edges}. Gli attributi di un nodo \texttt{edges} sono \texttt{id}, \texttt{target} e \texttt{source}. L'identificativo può essere scelto aribitrariamente, mentre \texttt{target} e \texttt{source} sono rispettivamnete la destinazione e la sorgente dell'arco.
 
 \subsection{Come vengono rappresentate le formule}
-Sono state definite due grammatiche, una per le formule \ac{CTL} una per quelle in \ac{ENF}(Grammatica~\ref{gra:enfs}).
+Sono state definite due grammatiche, una per le formule \ac{CTL} una per quelle in \ac{ENF} riportata in Grammatica~\ref{gra:enfs}.
 Una formula del tipo $\exists \square \forall(a U b) $ può essere scritta utilizzando la grammatica riportata in Grammatica~\ref{gra:ctls} in questo modo:
 $$ [] (a \ FU \ b) $$
 
@@ -365,16 +365,16 @@ Più specificatamente si indica gli operatori unari:
   \item $ \neg \varphi $ con !$\varphi $
   \item $ \exists \square \varphi$ con [] $\varphi $
   \item $ \exists \bigcircle \varphi$ con NEXT $\varphi $
-  \item $ \exists \diamond \varphi$ con EE $\varphi $
-  \item $ \forall \diamond \varphi$ con FE $\varphi $
+  \item $ \exists \lozenge \varphi$ con EE $\varphi $
+  \item $ \forall \lozenge \varphi$ con FE $\varphi $
   \item $ \forall \square \varphi$ con FA $\varphi $
   \item $ \forall \bigcircle \varphi$ con FN $\varphi $
 \end{itemize}
 Per gli operatori binari:
 \begin{itemize}
-  \item $ \exists (\boldsymbol{\varphi}_{1} \ U \ \boldsymbol{\varphi}_{2})$ con $ \boldsymbol{\varphi}_{1} \ UNTIL \ \boldsymbol{\varphi}_{2}$
+  \item $ \exists (\boldsymbol{\varphi}_{1} \ \boldsymbol{U} \ \boldsymbol{\varphi}_{2})$ con $ \boldsymbol{\varphi}_{1} \ UNTIL \ \boldsymbol{\varphi}_{2}$
   \item $ \boldsymbol{\varphi}_{1} \ \& \ \boldsymbol{\varphi}_{2}$ con $ \boldsymbol{\varphi}_{1} \ \& \ \boldsymbol{\varphi}_{2}$
-  \item $ \forall (\boldsymbol{\varphi}_{1} \ U \ \boldsymbol{\varphi}_{2})$ con $ \boldsymbol{\varphi}_{1} \ FU \ \boldsymbol{\varphi}_{2}$
+  \item $ \forall (\boldsymbol{\varphi}_{1} \ \boldsymbol{U} \ \boldsymbol{\varphi}_{2})$ con $ \boldsymbol{\varphi}_{1} \ FU \ \boldsymbol{\varphi}_{2}$
 \end{itemize}
 Le variabili atomiche si possono scrivere utilizzando concatenazioni di lettere minuscole dell'alfabeto o numeri interi.
 Si può scrivere ad esempio $(a \ \& \ b)$, ma anche $(a1 \ \& \ b32) $ oppure $ (zty \ \& \ x6)$.
@@ -405,7 +405,7 @@ Sono invece scartate formule con due o più operatori unari consecutivi in cui n
 \subsubsection{Il parsing della formula}
 \label{subsub:parsingformula}
 Per analizzare la formula si utilizza la libreria \texttt{pyparsing}. Si possono definire facilmente delle grammatiche e ricavare
-da una formula in notazione infissa, uno stack in notazione postfissa contenente elementi della formula.
+da una formula in notazione infissa uno stack in notazione postfissa, contenente tutti gli elementi della formula.
 
 Nel Codice~\ref{code:ctlParser} dalla linea 31 alla 42 si definiscono gli operatori unari e le variabili atomiche.
 Gli operatori unari possono essere:
@@ -432,13 +432,12 @@ e in aggiunta si valuta lo stack per restituire la stringa convertita.
 Una volta creato lo stack si invoca la funzione \texttt{evaluateStack} che ricorsivamente costruisce la stringa di output.
 In Codice~\ref{code:enfConverter} si mostrano i casi base in cui non si fanno modifiche alla formula.
 \lstinputlisting[firstnumber= 77,firstline = 77, lastline = 84, style = customPY, caption = ENF Converter, label = {code:enfConverter}]{CodiceRelazione/ENFConverter.py}
-In Codice~\ref{code:enfConverterFU} si mostra invece la conversione nel caso di FU(Forall until).
-Si utilizza l'equivalenza:
+In Codice~\ref{code:enfConverterFU} si mostra invece la conversione nel caso di FU(Forall until), dove viene utilizzata la seguente equivalenza:
 $$\forall(\phi \boldsymbol{U} \Psi) \equiv \neg \exists( \Psi \boldsymbol{U} (\neg \phi \wedge \Psi)  )\wedge \neg\exists\square\neg\Psi$$
-per passare da:
+per convertire la seguente formula:
 
 \centerline{$\phi$ FU $\Psi$}
-\centerline{a}
+nella controparte in \ac{ENF}:
 \centerline{!( $\Psi$ UNTIL (!$\phi$ \& $\Psi$)) \& !([]!($\Psi$))}
 
 \lstinputlisting[firstnumber= 102,firstline = 102, lastline = 106, style = customPY, caption = ENF Converter, label = {code:enfConverterFU}]{CodiceRelazione/ENFConverter.py}
