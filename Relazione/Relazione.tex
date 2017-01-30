@@ -106,7 +106,7 @@ Come si può notare dalla Formula \eqref{first} non è possibile imporre facilme
 Non è possibile usare questo sotterfugio per proprietà più complicate. Per esempio la proprietà
 \begin{prop}
 \label{prop:first}
-Per ogni computazione è sempre possibile ritornare in uno stato iniziale 
+Per ogni computazione è sempre possibile ritornare in uno stato iniziale
 \end{prop}
 non è esprimibile in \ac{LTL}. Un tentativo potrebbe essere $\square\lozenge start$, dove $start$ indica uno stato iniziale. Tuttavia una formula di questo tipo è troppo forte, in quanto impone che una computazione ritorni sempre in uno stato iniziale, e non soltanto eventualmente. \par
 \ac{CTL} risolve questi problemi introducendo una nozione di tempo che si basa sulle diramazioni. Quindi non abbiamo più un'infinita sequenza di stati, ma un infinito albero di stati. Questo comporta che in un determinato istante avremo diversi possibili futuri.\par
@@ -120,25 +120,25 @@ La proprietà \ref{prop:first} citata in precedenza è possibile ottenerla annid
 La Formula \eqref{second} si legge come: in ogni stato ($\square$) di ogni possibile computazione ($\forall$), è possibile ($\exists$) eventualmente ritornare in uno stato iniziale ($\lozenge start$).
 
 
-\subsection{Sintassi di \ac{CTL}} 
-\ac{CTL} ha una sintassi a due livelli, dove le formule sono classificate in \textit{formule sugli stati} e \textit{formule sui path}. 
+\subsection{Sintassi di \ac{CTL}}
+\ac{CTL} ha una sintassi a due livelli, dove le formule sono classificate in \textit{formule sugli stati} e \textit{formule sui path}.
 
 \begin{Grammar}
-	\begin{grammar}	
-	
+	\begin{grammar}
+
 	\centering
-	<$\boldsymbol{\phi}$> ::= true | a | $\boldsymbol{\phi}_{1} \wedge \boldsymbol{\phi}_{2}$ | $\neg \boldsymbol{\phi}$ | $	\exists \varphi$ | $\forall \varphi$ 
-	
+	<$\boldsymbol{\phi}$> ::= true | a | $\boldsymbol{\phi}_{1} \wedge \boldsymbol{\phi}_{2}$ | $\neg \boldsymbol{\phi}$ | $	\exists \varphi$ | $\forall \varphi$
+
 	\end{grammar}
 	\caption{Grammatica per le formule sugli stati}\label{gra:stateformulae}
 \end{Grammar}
 Le prime sono definite dalla Grammatica \ref{gra:stateformulae} dove $a \in AP$ e $\varphi$ è una formula sui path.
 \begin{Grammar}
-	\begin{grammar}	
-	
+	\begin{grammar}
+
 	\centering
-	<$\varphi$> ::= $\bigcircle \boldsymbol{\phi}$ | $\boldsymbol{\phi}_{1}\ \boldsymbol{U}\  \boldsymbol{\phi}_{2}$ 
-	
+	<$\varphi$> ::= $\bigcircle \boldsymbol{\phi}$ | $\boldsymbol{\phi}_{1}\ \boldsymbol{U}\  \boldsymbol{\phi}_{2}$
+
 	\end{grammar}
 	\caption{Grammatica per le formule sui path}\label{gra:pathformulae}
 \end{Grammar}
@@ -164,11 +164,11 @@ $$\pi \models \boldsymbol{\phi}\ \boldsymbol{U}\  \boldsymbol{\Psi} \iff \exists
 \section{Model Checking di \ac{CTL}}
 Data una formula \ac{CTL} $\phi$ ed un \ac{TS} l'obiettivo dell'algoritmo di Model Checking è quello di dire se il \ac{TS} soddisfa o meno la formula. Gli algoritmi proposti lavorano su formule in \ac{ENF}, definite dalla Grammatica~\ref{gra:enf}
 \begin{Grammar}
-	\begin{grammar}	
-	
+	\begin{grammar}
+
 	\centering
 	<$\phi$> ::= true | $a$ | $\phi_{1} \wedge \phi_{2}$ | $\neg \phi$ | $\exists\bigcircle\phi$ | $\exists\square\phi$ | $\exists(\phi_{1} \boldsymbol{U} \phi_{2})$
-	
+
 	\end{grammar}
 	\caption{Grammatica delle formule in ENF}\label{gra:enf}
 \end{Grammar}
@@ -181,7 +181,7 @@ Per ogni formula \ac{CTL} esiste un equivalente formula \ac{CTL} in \ac{ENF}
 \begin{proof}
 Grazie alle leggi di dualità si ottengono delle regole di traduzione:
 $$\forall\bigcircle \phi \equiv \neg \exists \bigcircle \neg \phi$$
-$$\forall(\phi \boldsymbol{U} \Psi) \equiv \neg \exists( \Psi \boldsymbol{U} (\neg \phi \wedge \Psi)  )\wedge \neg\exists\neq\Psi$$
+$$\forall(\phi \boldsymbol{U} \Psi) \equiv \neg \exists( \Psi \boldsymbol{U} (\neg \phi \wedge \Psi)  )\wedge \neg\exists\square\neg\Psi$$
 \end{proof}
 \begin{algorithm}
 \caption{Algoritmo di model checking base per \ac{CTL}}
@@ -237,7 +237,7 @@ Sat(\exists(\phi \boldsymbol{U} \Psi))\ \text{è il più piccolo sottoinsieme T 
 
 \begin{equation}\label{eq:te7}
 \begin{aligned}
-Sat(\exists(\square\phi)) \text{è il più grande sottoinsieme T di S tale che} \\ 
+Sat(\exists(\square\phi)) \text{è il più grande sottoinsieme T di S tale che} \\
 T \subseteq Sat (\phi) \wedge s \in T \implies Post(s) \cap T \neq \emptyset
 \end{aligned}
 \end{equation}
@@ -302,7 +302,7 @@ $$T_{0} = Sat(\phi)\ e \ T_{i+1} = T_{i} \cap \{s \in Sat(\phi)\  |\ Post(s) \ca
 L'algoritmo \ref{alg:always} realizza questa procedura con una ricerca volta all'indietro che inizia con
 $$T = Sat(\phi) \qquad e \qquad E = S\backslash Sat(\phi)$$
 in questo caso $T$ è uguale a $T_{0}$ ed $E$ contiene tutti gli stati per cui $\exists \square \phi$ è falsa. Durante la ricerca gli stati $s \in T$ che non soddisfano $\exists \square \phi$ vengono rimossi se $Post(s) \cap T = \emptyset$.
-Questa verifica è resa possibile da un array chiamato 
+Questa verifica è resa possibile da un array chiamato
 $count[s]$ definito $\forall s \in Sat(\phi)$ che conta quanti successori ha lo stato $s$. Questo contatore verrà decrementato ogni volta che uno stato contenuto nei predecessori di uno stato $s' \in E$ è anche in $T$. Quando il contatore è $0$ lo stato verrà marcato come stato che non soddisfa $\forall s \in Sat(\phi)$, quindi sarà rimosso da $T$ ed aggiunto ad $E$.
 
 
@@ -355,11 +355,95 @@ Uno stato di un \ac{TS} viene rappresentato assegnando, nel file \ac{GEXF} un fi
 Un arco è semplicemente rappresentato da un figlio \texttt{edge} del nodo padre \texttt{edges}. Gli attributi di un nodo \texttt{edges} sono \texttt{id}, \texttt{target} e \texttt{source}. L'identificativo può essere scelto aribitrariamente, mentre \texttt{target} e \texttt{source} sono rispettivamnete la destinazione e la sorgente dell'arco.
 
 \subsection{Come vengono rappresentate le formule}
+Sono state definite due grammatiche, una per le formule \ac{CTL} una per quelle in \ac{ENF}(Grammatica~\ref{gra:enfs}).
+Una formula del tipo $\exists \square \forall(a U b) $ può essere scritta utilizzando la grammatica riportata in Grammatica~\ref{gra:ctls} in questo modo:
+$$ [] (a \ FU \ b) $$
+
+Si distinguono gli operatori unari, come la negazione, e gli operatori binari, come \& o UNTIL.
+Più specificatamente si indica gli operatori unari:
+\begin{itemize}
+  \item $ \neg \varphi $ con !$\varphi $
+  \item $ \exists \square \varphi$ con [] $\varphi $
+  \item $ \exists \bigcircle \varphi$ con NEXT $\varphi $
+  \item $ \exists \diamond \varphi$ con EE $\varphi $
+  \item $ \forall \diamond \varphi$ con FE $\varphi $
+  \item $ \forall \square \varphi$ con FA $\varphi $
+  \item $ \forall \bigcircle \varphi$ con FN $\varphi $
+\end{itemize}
+Per gli operatori binari:
+\begin{itemize}
+  \item $ \exists (\boldsymbol{\varphi}_{1} \ U \ \boldsymbol{\varphi}_{2})$ con $ \boldsymbol{\varphi}_{1} \ UNTIL \ \boldsymbol{\varphi}_{2}$
+  \item $ \boldsymbol{\varphi}_{1} \ \& \ \boldsymbol{\varphi}_{2}$ con $ \boldsymbol{\varphi}_{1} \ \& \ \boldsymbol{\varphi}_{2}$
+  \item $ \forall (\boldsymbol{\varphi}_{1} \ U \ \boldsymbol{\varphi}_{2})$ con $ \boldsymbol{\varphi}_{1} \ FU \ \boldsymbol{\varphi}_{2}$
+\end{itemize}
+Le variabili atomiche si possono scrivere utilizzando concatenazioni di lettere minuscole dell'alfabeto o numeri interi.
+Si può scrivere ad esempio $(a \ \& \ b)$, ma anche $(a1 \ \& \ b32) $ oppure $ (zty \ \& \ x6)$.
+
+In molti casi si possono omettere le parentesi, ad esempio si può scrivere $ a \ UNTIL \ b \ UNTIL \ c$ che sarà valutata come $ (a \ UNTIL \ b) \ UNTIL \ c$.
+
+Sono invece scartate formule con due o più operatori unari consecutivi in cui non si specifica le parentesi, ad esempio $[] !a$ non sarà valutata mentre la formula $ [] (!a)$ sì.
+\begin{Grammar}
+	\begin{grammar}
+	\centering
+
+  <$atom$> ::= true | a \\
+  <$\boldsymbol{\varphi}$> ::= atom | $\neg \varphi$ | $[] \varphi$ | NEXT $\varphi$ | EE $\varphi$ | FE $\varphi$ | FA $\varphi$ | FN $\varphi$ | $\boldsymbol{\phi}$\\
+	<$\boldsymbol{\phi}$> ::= $\boldsymbol{\varphi}_{1} \ \& \ \boldsymbol{\varphi}_{2}$ | $\boldsymbol{\varphi}_{1} \ UNTIL \ \boldsymbol{\varphi}_{2}$ | $\boldsymbol{\varphi}_{1} \ FU \ \boldsymbol{\varphi}_{2}$ \\
+
+  \end{grammar}
+	\caption{Grammatica per le formule \ac{CTL}}\label{gra:ctls}
+\end{Grammar}
+\begin{Grammar}
+	\begin{grammar}
+	\centering
+  <$atom$> ::= true | a \\
+  <$\boldsymbol{\varphi}$> ::= atom | $\neg \varphi$ | $[] \varphi$ | NEXT $\varphi$ | $\boldsymbol{\phi}$\\
+	<$\boldsymbol{\phi}$> ::= $\boldsymbol{\varphi}_{1} \ \& \ \boldsymbol{\varphi}_{2}$ | $\boldsymbol{\varphi}_{1} \ UNTIL \ \boldsymbol{\varphi}_{2}$\\
+	\end{grammar}
+	\caption{Grammatica per le formule \ac{ENF}}\label{gra:enfs}
+\end{Grammar}
 \subsubsection{Il parsing della formula}
 \label{subsub:parsingformula}
-\subsubsection{La conversione in ENF}
+Per analizzare la formula si utilizza la libreria \texttt{pyparsing}. Si possono definire facilmente delle grammatiche e ricavare
+da una formula in notazione infissa, uno stack in notazione postfissa contenente elementi della formula.
 
-\subsection{Gli algoritmi di model checking} 
+Nel Codice~\ref{code:ctlParser} dalla linea 31 alla 42 si definiscono gli operatori unari e le variabili atomiche.
+Gli operatori unari possono essere:
+\begin{itemize}
+  \item un operatore e la variabile atomica semplice, es. !a
+  \item un operatore e la variabile atomica con le parentesi, es. !(a)
+  \item un operatore e un'espressione tra parentesi, es. !(a \& b)
+\end{itemize}
+Le variabili atomiche sono "TRUE" oppure tutte le possibili concatenazioni di lettere minuscole o numeri interi quindi: $ ((a..z)^*(1..9)^*)^*$.
+
+Alla linea 48 nella variabile \texttt{factor} si salvano le possibili operazioni binarie utilizzando la funzione di \texttt{pyparsing} \texttt{ZeroOrMore}.
+Infatti nella formula possono esserci zero operazioni di \& o UNTIL e quindi factor sarà formato solo da \texttt{atoms} cioè le combinazioni di espressioni con operazioni unarie o variabili atomiche.
+Se presenti, le operazioni binarie sono del tipo:
+\begin{itemize}
+  \item un operatore e le due espressioni, es. a \& !b
+  \item una serie di operatori e le espressioni, es. a \& b \& (c UNTIL d) \& e
+\end{itemize}
+Ad ogni elemento è associata un'azione che inserisce il valore nello stack, es \& ha \texttt{pushBinary}.
+La funzione \texttt{parseString} (linea 54) identifica gli elementi appartenenti alla formula e invoca le azioni al momento dell'idividuazione dell'espressione.
+\lstinputlisting[firstnumber= 31,firstline = 31, lastline = 55, style = customPY, caption = Parser CTL, label = {code:ctlParser}]{CodiceRelazione/CTLParser.py}
+\subsubsection{La conversione in ENF}
+Per convertire la formula in \ac{ENF} si crea con stessa metodologia usata nel parsing uno stack contenente gli elementi della formula in notazione postfissa,
+e in aggiunta si valuta lo stack per restituire la stringa convertita.
+Una volta creato lo stack si invoca la funzione \texttt{evaluateStack} che ricorsivamente costruisce la stringa di output.
+In Codice~\ref{code:enfConverter} si mostrano i casi base in cui non si fanno modifiche alla formula.
+\lstinputlisting[firstnumber= 77,firstline = 77, lastline = 84, style = customPY, caption = ENF Converter, label = {code:enfConverter}]{CodiceRelazione/ENFConverter.py}
+In Codice~\ref{code:enfConverterFU} si mostra invece la conversione nel caso di FU(Forall until).
+Si utilizza l'equivalenza:
+$$\forall(\phi \boldsymbol{U} \Psi) \equiv \neg \exists( \Psi \boldsymbol{U} (\neg \phi \wedge \Psi)  )\wedge \neg\exists\square\neg\Psi$$
+per passare da:
+
+\centerline{$\phi$ FU $\Psi$}
+\centerline{a}
+\centerline{!( $\Psi$ UNTIL (!$\phi$ \& $\Psi$)) \& !([]!($\Psi$))}
+
+\lstinputlisting[firstnumber= 102,firstline = 102, lastline = 106, style = customPY, caption = ENF Converter, label = {code:enfConverterFU}]{CodiceRelazione/ENFConverter.py}
+
+\subsection{Gli algoritmi di model checking}
 Il model checker vero e proprio è definito come una classe in python, che per essere istanziata necessita di un \ac{TS} e di una formula \ac{CTL} in ENF. Quindi in fase di costruzione si occuperà di leggere il file \ac{GEXF} e convertire la formula in notazione postfissa, memorizzandola in uno stack, come descritto in Sottosezione \ref{subsub:parsingformula}.\par
 Una volta creata l'istanza della classe \texttt{CTLModelChecker} è necessario chiamare la funzione mostrata in Codice~\ref{code:basefunction}, che rappresenta una possibile implementazione dell'Algoritmo \ref{alg:base}.
 \lstinputlisting[firstline = 22, lastline = 47, style=customPY, caption = Funzione che effettua il model checking base, label = {code:basefunction}]{CodiceRelazione/modelchecker.py}
@@ -385,7 +469,7 @@ Per realizzare questa ottimizzazione è stato inserito un dizionario all'interno
 \lstinputlisting[firstline = 24, lastline = 66, style = customPY, caption = Funzione per il model checking base ottimizzata con la tecnica del caching, label = {code:basecache}]{CodiceRelazione/modelcheckercaching.py}
 \section{Esempi di utilizzo del Model Checker di \ac{CTL} in Python}
 Per provare il model checker è stato inoltre sviluppato un piccolo script Python che costruisce il \ac{TS} che modella il problema dei filosofi a cena. Questo script, dato in input un intero $n$ restituisce il \ac{GEXF} che rappresenta il \ac{TS} con $n$ filosofi.
-Le proposizioni atomiche del \ac{TS} generato sono: 
+Le proposizioni atomiche del \ac{TS} generato sono:
 $$AP = \{e_0, \dots, e_n, t_0, \dots, t_n, h_0, \dots, h_n, w_0, \dots, w_n \}$$
 che rappresentano gli stati possibili in cui si può trovare ognuno degli $n$ filosofi:
 \begin{itemize}
@@ -411,23 +495,3 @@ Lo stato iniziale del \ac{TS} generato sarà lo stato che conterrà come label l
 \end{acronym}
 
 \end{document}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
