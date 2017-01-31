@@ -472,16 +472,16 @@ Per provare il model checker sono state verificate le formule di esempio analizz
 che costruisce il \ac{TS} che modella il problema dei filosofi a cena.
 \subsection{Formula $ \exists \lozenge  \phi$}
 Sul \ac{TS} riportato in Figura~\ref{ts6} è stato verificata la formula $ \exists \lozenge  \phi$ in cui
-$$ \phi = ((a = c) or (a != b))$$
+$$ \phi = ((a\ =\ c)\ or\ (a\ !=\ b))$$
 cioè  $\phi = !(!(a \ \& \ c \ \& \ !b) \ \& \ !(!a \ \& \ !c \ \& \ b))$.
 La formula nella sintassi descritta in Grammatica~\ref{gra:ctls} equivale a
 
-$$ EE (!(!( a \& c \& !b) \& !( !a \& !c \& b)))$$
+$$ \text{EE} (!(!( a\ \&\ c\ \&\ !b)\ \&\ !( !a\ \&\ !c\ \&\ b)))$$
  e sarà tradotta in \ac{ENF} in \\
-$$TRUE UNTIL (!(!(a \& c \& !(b)) \& !(!(a) \& !(c) \& b)))$$
+$$\text{TRUE UNTIL} (!(!(a\ \&\ c\ \&\ !(b))\ \&\ !(!(a)\ \&\ !(c)\ \&\ b)))$$
  per poi essere passata al modelChecker. Questo restituisce il risultato della valutazione e l'insieme di stati soddisfatti cioè:
 
-$$(False, ['5', '4', '6', '7'])$$
+$$(\text{False}, ['5', '4', '6', '7'])$$
 Si può anche utilizzare l'insieme ricavato per mostrare visivamente gli stati soddisfatti come mostrato in Figura~\ref{tsResult1}.
 \begin{figure}
   \includegraphics[width=\linewidth]{img/ts.png}
@@ -500,7 +500,7 @@ $ \exists \square b$ equivale a
 
 $$[] b$$
 e il modelChecker restituisce 
-$$(False, ['0', '2', '4'])$$.
+$$(\text{False}, ['0', '2', '4'])$$.
 Il risultato in questo esempio si mostra in Figura~\ref{tsResult2}
 \begin{figure}
   \includegraphics[width=\linewidth]{img/tsResult2.png}
