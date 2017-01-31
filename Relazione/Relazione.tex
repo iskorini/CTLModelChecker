@@ -499,7 +499,7 @@ La formula in questo caso è già in \ac{ENF} quindi il convertitore non la modi
 $ \exists \square b$ equivale a
 
 $$[] b$$
-e il modelChecker restituisce 
+e il modelChecker restituisce
 $$(\text{False}, ['0', '2', '4'])$$.
 Il risultato in questo esempio si mostra in Figura~\ref{tsResult2}
 \begin{figure}
@@ -521,6 +521,31 @@ che rappresentano gli stati possibili in cui si può trovare ognuno degli $n$ fi
   \item{$e_0 \dots e_n$ rappresenta le prooposizioni atomiche dove il filosofo è nello stato "eating", ovvero quando mangia}
 \end{itemize}
 Lo stato iniziale del \ac{TS} generato sarà lo stato che conterrà come label l'insieme $\{t_0 \dots t_n\}$, cioè quando tutti i filosofi sono nello stato di "thinking".
+
+Prendendo ad esempio il transition system per tre filosofi, si può verificare la starvation freedom con questa formula:
+$$ \forall \square \forall \lozenge e1 \& \forall \square \forall \lozenge e2 \& \forall \square \forall \lozenge e3$$
+cioè
+$$ \text{FA (FE e1) \& FA (FE e2) \& FA (FE e3)} $$.
+Il modelChecker restituisce \texttt{False} in quanto il deadlock può verificarsi nello stato \texttt{w1w2w3} in cui
+ciascuno dei filosofi tiene in mano una forchetta senza mai riuscire a prendere l'altra.
+
+Si può inoltre utilizzare il ts dei filosofi per esaminare l'uso del caching su una formula di grandi dimensioni.
+Prendendo ad esempio una formula che è formata da solo una concatenazione di tre $\forall \boldsymbol{Until}$:
+$$ \text{t1 FU h1 FU w1 FU e1}$$.
+Questa dopo la conversione in \ac{ENF} diventa:
+$$!(!(!(!(!(!(t1)UNTIL(!(h1)\&!(t1))) \& !([](!(t1))))UNTIL $$
+$$(!(w1)\&!(!(!(t1)UNTIL(!(h1)\&!(t1))) \& !([](!(t1)))))) $$
+$$ \& !([](!(!(!(t1)UNTIL(!(h1)\&!(t1))) \& !([](!(t1)))))))$$
+$$UNTIL(!(e1)\&!(!(!(!(!(t1)UNTIL(!(h1)\&!(t1))) $$
+$$ \& !([](!(t1))))UNTIL(!(w1)\&!(!(!(t1)UNTIL(!(h1)\&!(t1))) $$
+$$\& !([](!(t1)))))) \& !([](!(!(!(t1)UNTIL(!(h1)\&!(t1))) $$
+$$ \& !([](!(t1))))))))) \& !([](!(!(!(!(!(t1)UNTIL(!(h1)\&!(t1))) $$
+$$\& !([](!(t1))))UNTIL(!(w1)\&!(!(!(t1)UNTIL(!(h1)\&!(t1))) $$
+$$ \& !([](!(t1)))))) \& !([](!(!(!(t1)UNTIL(!(h1)\&!(t1))) \& !([](!(t1)))))))))$$
+
+Il modelChecker standard impiega 15 secondi per verificare la formula sul ts di cinque filosofi(), la versione con il caching ne utilizza solo 5.
+
+
 
 
 

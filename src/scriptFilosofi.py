@@ -111,6 +111,7 @@ if __name__ == "__main__":
     # print next("t1t2",2,2)
     args = sys.argv
     generateXML(int(args[1]))
+    print "ts " + args[1] + " filosofi generato"
     # print generateState("e", 0)
     # print "TT ",next("TT" , 2)
     # print "HH ",next("HH" , 2)
