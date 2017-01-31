@@ -8,10 +8,11 @@ import time
 
 class CTLModelChecker:
 
-    __ts = ''
-    __formula = ''
+    __ts = ""
+    __formula = ""
     __satisfactionSet = []
     __nodes = []
+    __cache = dict()
 
     def __init__(self, tsPath, formula):
         ts = nx.read_gexf(tsPath, node_type=None, relabel=False, version='1.1draft')
@@ -28,17 +29,34 @@ class CTLModelChecker:
             elif i == '&':
                 el0 = satisfactionSet.pop()
                 el1 = satisfactionSet.pop()
-                satisfactionSet.append(self.__checkAnd(el0, el1))
+                if str(el0) + "&" + str(el1) in self.__cache:
+                    satisfactionSet.append(self.__cache[str(el0) + "&" + str(el1)])
+                else:
+                    self.__cache[str(el0) + "&" + str(el1)] = self.__checkAnd(el0, el1)
+                    satisfactionSet.append(self.__cache[str(el0) + "&" + str(el1)])
             elif i == 'UNTIL':
                 el0 = satisfactionSet.pop()
                 el1 = satisfactionSet.pop()
-                satisfactionSet.append(self.__checkUntil(el0, el1))
+                if str(el0) + "UNTIL" + str(el1) in self.__cache:
+                    satisfactionSet.append(self.__cache[str(el0) + "UNTIL" + str(el1)])
+                else:
+                    self.__cache[str(el0) + "UNTIL" + str(el1)] = self.__checkUntil(el0, el1)
+                    satisfactionSet.append(self.__cache[str(el0) + "UNTIL" + str(el1)])
             elif i == 'NEXT':
                 el0 = satisfactionSet.pop()
                 satisfactionSet.append(self.__checkNext(el0))
+                if "NEXT" + str(el0) in self.__cache:
+                    satisfactionSet.append(self.__cache["NEXT" + str(el0)])
+                else:
+                    self.__cache["NEXT" + str(el0)] = self.__checkNext(el0)
+                    satisfactionSet.append(self.__cache["NEXT" + str(el0)])
             elif i == '[]':
                 el0 = satisfactionSet.pop()
-                satisfactionSet.append(self.__checkAlways(el0))
+                if "[]" + str(el0) in self.__cache:
+                    satisfactionSet.append(self.__cache["[]" + str(el0)])
+                else:
+                    self.__cache["[]" + str(el0)] = self.__checkAlways(el0)
+                    satisfactionSet.append(self.__cache["[]" + str(el0)])
             elif i == 'TRUE':
                 satisfactionSet.append(self.__checkTrue())
             elif i[0].isalpha():
@@ -48,8 +66,6 @@ class CTLModelChecker:
 
     def __checkInitialStates(self, satSet):
         initialStates = filter(lambda x: 'S' in x, self.__nodes)
-        if satSet[0] is None:
-            return False
         for state in initialStates:
             if state not in satSet[0]:
                 return False
@@ -97,18 +113,19 @@ class CTLModelChecker:
 
     def __checkSingle(self, i):
         tempList = []
+        if i in self.__cache:
+            return self.__cache[i]
         for node in self.__nodes:
             if i in self.__nodes[node]:
                 tempList.append(node)
+        self.__cache[i] = tempList
         return tempList
 
     def __checkAnd(self, el0, el1):
         return list(set(el0).intersection(el1))
 
     def __checkNot(self, el0):
-        if el0 is not None:
-            return list(set(self.__nodes) - set(el0))
-        return []
+        return list(set(self.__nodes.keys()) - set(el0))
 
     def getTs(self):
         return self.__nodes
@@ -126,4 +143,4 @@ if __name__ == '__main__':
     modelChecker = CTLModelChecker(args[2], convertedFormula)
     result = modelChecker.iterativeCheckFormula()
     print result[0]
-    print("Standard --- %s seconds ---" % (time.time() - start))
+    print("Cashing --- %s seconds ---" % (time.time() - start))

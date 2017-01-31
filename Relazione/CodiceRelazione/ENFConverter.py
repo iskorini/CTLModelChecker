@@ -132,7 +132,7 @@ if __name__ == '__main__':
         print s
         print '### stack  generato ###'
         print results
-    test('FA (FE(a))')
+    test('[] FE (a)')
     # test('(NEXT a) FU b')
     # test('FA (a & b)')
     # test('EE (a & b)')

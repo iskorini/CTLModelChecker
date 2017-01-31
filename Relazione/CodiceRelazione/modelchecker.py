@@ -3,7 +3,6 @@ import sys
 from pyparsing import alphas
 from CTLParser import CTLParser
 from ENFConverter import ENFConverter
-import time
 
 
 class CTLModelChecker:
@@ -18,6 +17,7 @@ class CTLModelChecker:
         self.__ts = ts
         self.__nodes = nx.get_node_attributes(self.__ts, 'label')
         self.__formula = CTLParser().getParsedFormula(formula)
+        print self.__formula
 
     def iterativeCheckFormula(self):
         satisfactionSet = []
@@ -59,7 +59,7 @@ class CTLModelChecker:
         E = list(set(self.__nodes) - set(el0))
         T = el0
         count = dict()
-        for el in el0:  # cambiare con map
+        for el in el0:  
             count[el] = len(self.__ts.successors(el))
         while len(E) > 0:
             s1 = E.pop()
@@ -79,7 +79,6 @@ class CTLModelChecker:
             if len(set(successors).intersection(set(el0))) > 0:
                 tempList.append(node)
         return tempList
-
     def __checkUntil(self, el0, el1):
         E = el0
         T = E[:]
@@ -115,15 +114,3 @@ class CTLModelChecker:
 
     def getFormulaStack(self):
         return self.__formula
-
-
-if __name__ == '__main__':
-    args = sys.argv
-    start = time.time()
-    print args[1]
-    convertedFormula = ENFConverter().convert(args[1])
-    print convertedFormula
-    modelChecker = CTLModelChecker(args[2], convertedFormula)
-    result = modelChecker.iterativeCheckFormula()
-    print result[0]
-    print("Standard --- %s seconds ---" % (time.time() - start))

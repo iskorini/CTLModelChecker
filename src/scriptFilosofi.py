@@ -1,6 +1,7 @@
 from array import array
 from xml.etree.ElementTree import Element, SubElement, Comment, tostring, ElementTree
 from xml.dom import minidom
+import sys
 # transizioni da uno stato all altro
 stateTransition = {'t': 'h', 'h': 'w', 'w': 'e', 'e': 't'}
 states = {}
@@ -107,8 +108,9 @@ def checkEating(state):
 
 
 if __name__ == "__main__":
-    # print next("t1t2",2,2)
-    generateXML(5)
+    args = sys.argv
+    generateXML(int(args[1]))
+    print "ts " + args[1] + " filosofi generato"
     # print generateState("e", 0)
     # print "TT ",next("TT" , 2)
     # print "HH ",next("HH" , 2)

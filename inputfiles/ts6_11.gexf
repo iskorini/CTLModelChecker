@@ -2,14 +2,14 @@
 <gexf xmlns="http://www.gexf.net/1.2draft" xmlns:viz="http://www.gexf.net/1.2draft/viz" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.gexf.net/1.2draft http://www.gexf.net/1.2draft/gexf.xsd" version="1.2">
     <graph mode="static" defaultedgetype="directed">
         <nodes>
-            <node id="S1" label="a,b"/>
-            <node id="2" label="b,c"/>
+            <node id="0" label="a, b, c"/>
+            <node id="S1" label="a, b"/>
+            <node id="2" label="b, c"/>
             <node id="3" label="a"/>
             <node id="4" label="b"/>
-            <node id="5" label="a,c"/>
+            <node id="5" label="a, c"/>
             <node id="6" label="c"/>
             <node id="7" label=""/>
-            <node id="0" label="a,b, c"/>
         </nodes>
         <edges>
             <edge id="0" source="0" target="2"/>
