@@ -466,8 +466,51 @@ L'ultima operazione effettuata dall'Algoritmo \ref{alg:base} è verificare se gl
 Con lo scopo di migliorare le prestazioni dell'algoritmo di Model Checking è stata sviluppata un'ulteriore versione che fa uso di una tecnica di caching. Usando questa tecnica ad ogni passo viene memorizzato in un dizionario il risultato delle sottoformule valutate. In questo modo, se la formula contiene più sottoformule uguali non è necessario rivalutarle ogni volta, ma basta accedere al dizionario per prenderne il risultato.
 Per realizzare questa ottimizzazione è stato inserito un dizionario all'interno della classe, ed il metodo \texttt{iterativeCheckFormula} mostrato in Codice \ref{code:basefunction} è stato modificato. Il nuovo metodo \texttt{iterativeCheckFormula} per ogni elemento dello stack verifica prima se è già stato valutato effettuando un accesso nel dizionario. Nel caso in cui sia già stato valutato non effettua una chiamata al metodo che si occupa della valutazione, ma aggiunge alla pila degli stati soddisfatti l'elemento corrispondente del dizionario. L'implementazione di questa funzione è mostrata in Codice~\ref{code:basecache}.
 \lstinputlisting[firstline = 24, lastline = 66, style = customPY, caption = Funzione per il model checking base ottimizzata con la tecnica del caching, label = {code:basecache}]{CodiceRelazione/modelcheckercaching.py}
+
 \section{Esempi di utilizzo del Model Checker di \ac{CTL} in Python}
-Per provare il model checker è stato inoltre sviluppato un piccolo script Python che costruisce il \ac{TS} che modella il problema dei filosofi a cena. Questo script, dato in input un intero $n$ restituisce il \ac{GEXF} che rappresenta il \ac{TS} con $n$ filosofi.
+Per provare il model checker sono state verificate le formule di esempio analizzate nel libro di testo, inoltre è stato sviluppato un piccolo script Python
+che costruisce il \ac{TS} che modella il problema dei filosofi a cena.
+\subsection{Formula $ \exists \lozenge  \phi$}
+Sul \ac{TS} riportato in Figura~\ref{ts6} è stato verificata la formula $ \exists \lozenge  \phi$ in cui
+$$ \phi = ((a = c) or (a != b))$$
+cioè  $\phi = !(!(a \ \& \ c \ \& \ !b) \ \& \ !(!a \ \& \ !c \ \& \ b))$.
+La formula nella sintassi descritta in Grammatica~\ref{gra:ctls} equivale a
+\\
+\centerline{\texttt{ EE (!(!( a \& c \& !b) \& !( !a \& !c \& b)))}}
+\\ e sarà tradotta in \ac{ENF} in \\
+\centerline{\texttt{TRUE UNTIL (!(!(a \& c \& !(b)) \& !(!(a) \& !(c) \& b)))}}
+\\ per poi essere passata al modelChecker. Questo restituisce il risultato della valutazione e l'insieme di stati soddisfatti cioè:
+\\
+\centerline{\texttt{(False, ['5', '4', '6', '7'])}}
+Si può anche utilizzare l'insieme ricavato per mostrare visivamente gli stati soddisfatti come mostrato in Figura~\ref{tsResult1}.
+\begin{figure}
+  \includegraphics[width=\linewidth]{img/ts.png}
+  \caption{Transition system}
+  \label{ts6}
+\end{figure}
+\begin{figure}
+  \includegraphics[width=\linewidth]{img/tsResult.png}
+  \caption{Transition system risultante}
+  \label{tsResult1}
+\end{figure}
+
+\subsection{Formula $ \exists \square b$}
+La formula in questo caso è già in \ac{ENF} quindi il convertitore non la modifica.
+$ \exists \square b$ equivale a
+\\
+\texttt{[] b}
+\\ e il modelChecker restituisce \\
+\texttt{(False, ['0', '2', '4'])}.
+Il risultato in questo esempio si mostra in Figura~\ref{tsResult2}
+\begin{figure}
+  \includegraphics[width=\linewidth]{img/tsResult2.png}
+  \caption{Transition system risultante}
+  \label{tsResult2}
+\end{figure}
+
+\subsection{Fisolofi a cena}
+
+Lo script creato per modellare il problema dei fisolofi a cena, dato in input un intero $n$ restituisce il \ac{GEXF} che rappresenta il \ac{TS} con $n$ filosofi.
 Le proposizioni atomiche del \ac{TS} generato sono:
 $$AP = \{e_0, \dots, e_n, t_0, \dots, t_n, h_0, \dots, h_n, w_0, \dots, w_n \}$$
 che rappresentano gli stati possibili in cui si può trovare ognuno degli $n$ filosofi:

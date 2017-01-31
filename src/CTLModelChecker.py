@@ -17,7 +17,6 @@ class CTLModelChecker:
         self.__ts = ts
         self.__nodes = nx.get_node_attributes(self.__ts, 'label')
         self.__formula = CTLParser().getParsedFormula(formula)
-        print self.__formula
 
     def iterativeCheckFormula(self):
         satisfactionSet = []
