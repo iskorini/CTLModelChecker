@@ -108,7 +108,6 @@ def checkEating(state):
 
 
 if __name__ == "__main__":
-    # print next("t1t2",2,2)
     args = sys.argv
     generateXML(int(args[1]))
     print "ts " + args[1] + " filosofi generato"
