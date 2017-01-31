@@ -11,18 +11,18 @@ if __name__ == "__main__":
     nx.draw_networkx_labels(graph, pos, font_size=12)
 
     converter = ENFConverter()
-    formula = "FE e1"
+    formula = "t1 FU e1"
     print "Formula: ", formula
     convertedFormula = converter.convert(formula)
     print "Formula in ENF: ", convertedFormula
     modelChecker = CTLModelChecker(path, convertedFormula)
-    print "Transition system: ", modelChecker.getTs()
-    print "Formula stack: ", modelChecker.getFormulaStack()
-    print "Start check"
+    # print "Transition system: ", modelChecker.getTs()
+    # print "Formula stack: ", modelChecker.getFormulaStack()
+    # print "Start check"
     print "Risultato , Elementi soddisfatti "
     result = modelChecker.iterativeCheckFormula()
-    print result
-    nx.draw_networkx_nodes(graph, pos, result[1], node_color='#42f46e', node_size=600, alpha=0.8)
-    plt.figure(1)
-    plt.axis('off')
-    plt.savefig("ts6_1.png")
+    print result[0]
+    # nx.draw_networkx_nodes(graph, pos, result[1], node_color='#42f46e', node_size=600, alpha=0.8)
+    # plt.figure(1)
+    # plt.axis('off')
+    # plt.savefig("ts6_1.png")

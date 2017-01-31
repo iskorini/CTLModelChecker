@@ -1,9 +1,11 @@
 from array import array
 from xml.etree.ElementTree import Element, SubElement, Comment, tostring, ElementTree
 from xml.dom import minidom
+import sys
 # transizioni da uno stato all altro
 stateTransition = {'t': 'h', 'h': 'w', 'w': 'e', 'e': 't'}
 states = {}
+
 
 def prettify(elem):
     rough_string = tostring(elem)
@@ -32,7 +34,7 @@ def generateXML(philnumber):
                 states[nextState[0]] = []
                 # si aggiunge allo stack per trovare i successori
                 stack.append(nextState)
-        print s[0], "forchette disp ", s[1], ":", states[s[0]]
+        # print s[0], "forchette disp ", s[1], ":", states[s[0]]
     top = Element('gexf', attrib={'xmlns': "http://www.gexf.net/1.2draft", 'xmlns:viz': "http://www.gexf.net/1.2draft/viz", 'xmlns:xsi': "http://www.w3.org/2001/XMLSchema-instance", 'xsi:schemaLocation': "http://www.gexf.net/1.2draft http://www.gexf.net/1.2draft/gexf.xsd", 'version': "1.2"})
     graphNode = SubElement(top, 'graph', attrib={'mode': "static", 'defaultedgetype': "directed"})
     nodesNode = SubElement(graphNode, 'nodes')
@@ -107,7 +109,8 @@ def checkEating(state):
 
 if __name__ == "__main__":
     # print next("t1t2",2,2)
-    generateXML(2)
+    args = sys.argv
+    generateXML(int(args[1]))
     # print generateState("e", 0)
     # print "TT ",next("TT" , 2)
     # print "HH ",next("HH" , 2)
