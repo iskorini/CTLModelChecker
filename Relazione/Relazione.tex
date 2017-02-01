@@ -229,17 +229,17 @@ Sat(\exists\bigcircle\phi) = \{s \in S | Post(s) \cap Sat(\phi) \neq \emptyset\}
 \end{equation}
 
 \begin{equation}\label{eq:te6}
-\begin{aligned}
+\begin{gathered}
 Sat(\exists(\phi \boldsymbol{U} \Psi))\ \text{è il più piccolo sottoinsieme T di S tale per cui } \\
 (Sat(\Psi) \subseteq T \wedge (s \in Sat(\phi) \wedge Post(s) \cap T \neq \emptyset)) \implies s \in T
-\end{aligned}
+\end{gathered}
 \end{equation}
 
 \begin{equation}\label{eq:te7}
-\begin{aligned}
+\begin{gathered}
 Sat(\exists(\square\phi)) \text{è il più grande sottoinsieme T di S tale che} \\
 T \subseteq Sat (\phi) \wedge s \in T \implies Post(s) \cap T \neq \emptyset
-\end{aligned}
+\end{gathered}
 \end{equation}
 \end{theor}
 
@@ -427,6 +427,7 @@ Ad ogni elemento è associata un'azione che inserisce il valore nello stack, es 
 La funzione \texttt{parseString} (linea 54) identifica gli elementi appartenenti alla formula e invoca le azioni al momento dell'idividuazione dell'espressione.
 \lstinputlisting[firstnumber= 31,firstline = 31, lastline = 55, style = customPY, caption = Parser CTL, label = {code:ctlParser}]{CodiceRelazione/CTLParser.py}
 \subsubsection{La conversione in ENF}
+\label{subsub:conversion}
 Per convertire la formula in \ac{ENF} si crea con stessa metodologia usata nel parsing uno stack contenente gli elementi della formula in notazione postfissa,
 e in aggiunta si valuta lo stack per restituire la stringa convertita.
 Una volta creato lo stack si invoca la funzione \texttt{evaluateStack} che ricorsivamente costruisce la stringa di output.
@@ -463,45 +464,53 @@ Per l'operatore $\boldsymbol{U}$ è stato implementato l'Algoritmo \ref{alg:unti
 \lstinputlisting[firstline = 82, lastline = 92, style = customPY, caption = Funzione per il calcolo del UNTIL, label = {code:until}]{CodiceRelazione/modelchecker.py}
 L'ultima operazione effettuata dall'Algoritmo \ref{alg:base} è verificare se gli stati iniziali sono un sottoinsieme degli stati soddisfatti dalla formula. Il Codice \ref{code:basefunction} effettua questa operazione alla riga 26.
 \subsection{Una versione migliorata del Model Checker}
+\label{sub:cachingmc}
 Con lo scopo di migliorare le prestazioni dell'algoritmo di Model Checking è stata sviluppata un'ulteriore versione che fa uso di una tecnica di caching. Usando questa tecnica ad ogni passo viene memorizzato in un dizionario il risultato delle sottoformule valutate. In questo modo, se la formula contiene più sottoformule uguali non è necessario rivalutarle ogni volta, ma basta accedere al dizionario per prenderne il risultato.
 Per realizzare questa ottimizzazione è stato inserito un dizionario all'interno della classe, ed il metodo \texttt{iterativeCheckFormula} mostrato in Codice \ref{code:basefunction} è stato modificato. Il nuovo metodo \texttt{iterativeCheckFormula} per ogni elemento dello stack verifica prima se è già stato valutato effettuando un accesso nel dizionario. Nel caso in cui sia già stato valutato non effettua una chiamata al metodo che si occupa della valutazione, ma aggiunge alla pila degli stati soddisfatti l'elemento corrispondente del dizionario. L'implementazione di questa funzione è mostrata in Codice~\ref{code:basecache}.
 \lstinputlisting[firstline = 24, lastline = 66, style = customPY, caption = Funzione per il model checking base ottimizzata con la tecnica del caching, label = {code:basecache}]{CodiceRelazione/modelcheckercaching.py}
 
 \section{Esempi di utilizzo del Model Checker di \ac{CTL} in Python}
-Per provare il model checker sono state verificate le formule di esempio analizzate nel libro di testo, inoltre è stato sviluppato un piccolo script Python
+Per provare il model checker sono state verificate alcune formule di esempio presenti nel libro di testo \cite{book:baier}, inoltre è stato sviluppato un piccolo script Python
 che costruisce il \ac{TS} che modella il problema dei filosofi a cena.
 \subsection{Formula $ \exists \lozenge  \phi$}
 Sul \ac{TS} riportato in Figura~\ref{ts6} è stato verificata la formula $ \exists \lozenge  \phi$ in cui
-$$ \phi = ((a\ =\ c)\ or\ (a\ !=\ b))$$
-cioè  $\phi = !(!(a \ \& \ c \ \& \ !b) \ \& \ !(!a \ \& \ !c \ \& \ b))$.
-La formula nella sintassi descritta in Grammatica~\ref{gra:ctls} equivale a
+\begin{equation}\label{eq:form1}
+\begin{aligned}
+\phi = ((a\ =\ c)\ or\ (a\ !=\ b))
+\end{aligned}
+\end{equation}
+che risulta essere equivalente  $\phi = !(!(a \ \& \ c \ \& \ !b) \ \& \ !(!a \ \& \ !c \ \& \ b))$ in \ac{ENF}.
+Quindi la formula di partenza, espressa secondo la sintassi descritta in Grammatica~\ref{gra:ctls} risulta essere in questa forma:
 
 $$ \text{EE} (!(!( a\ \&\ c\ \&\ !b)\ \&\ !( !a\ \&\ !c\ \&\ b)))$$
- e sarà tradotta in \ac{ENF} in \\
+ che successivamente, grazie alle tecniche descritte in Sezione \ref{subsub:conversion} sarà tradotta in \ac{ENF}:
 $$\text{TRUE UNTIL} (!(!(a\ \&\ c\ \&\ !(b))\ \&\ !(!(a)\ \&\ !(c)\ \&\ b)))$$
- per poi essere passata al modelChecker. Questo restituisce il risultato della valutazione e l'insieme di stati soddisfatti cioè:
-
+ per poi essere passata al Model Checker. Quest'ultimo restituisce il risultato della valutazione sul \ac{TS} (True o False) e l'eventuale insieme di stati che soddisfano la formula:
 $$(\text{False}, ['5', '4', '6', '7'])$$
-Si può anche utilizzare l'insieme ricavato per mostrare visivamente gli stati soddisfatti come mostrato in Figura~\ref{tsResult1}.
-\begin{figure}
+Come mostrato in Figura~\ref{tsResult1} il Model Checker sviluppato permette di visualizzare visivamente gli stati soddisfatti dalla formula. Gli stati soddisfatti da una formula vengono evidenziati in verde, mentre gli stati che non la soddisfano sono evidenziati in azzurro.
+\begin{figure}[h]
   \includegraphics[width=\linewidth]{img/ts.png}
   \caption{Transition system}
   \label{ts6}
 \end{figure}
-\begin{figure}
+\begin{figure}[h]
   \includegraphics[width=\linewidth]{img/tsResult.png}
   \caption{Transition system risultante}
   \label{tsResult1}
 \end{figure}
 
 \subsection{Formula $ \exists \square b$}
-La formula in questo caso è già in \ac{ENF} quindi il convertitore non la modifica.
-$ \exists \square b$ equivale a
+La formula fornita come dato di ingresso al Model Checker in questo caso è già in \ac{ENF} quindi il convertitore non la modifica.
+Secondo la Grammatica~\ref{gra:ctls} la formula $ \exists \square b$ è equivalente a
+\begin{equation}\label{eq:form2}
+\begin{aligned}
+[] b
+\end{aligned}
+\end{equation}
 
-$$[] b$$
-e il modelChecker restituisce
-$$(\text{False}, ['0', '2', '4'])$$.
-Il risultato in questo esempio si mostra in Figura~\ref{tsResult2}
+Dato il \ac{TS} in Figura \ref{ts6}, e la Formula \eqref{eq:form2}, il risultato del Model Checker è il seguente:
+$$(\text{False}, ['0', '2', '4'])$$
+Il risultato del model checking è mostrato anche in Figura~\ref{tsResult2}.
 \begin{figure}
   \includegraphics[width=\linewidth]{img/tsResult2.png}
   \caption{Transition system risultante}
@@ -522,38 +531,34 @@ che rappresentano gli stati possibili in cui si può trovare ognuno degli $n$ fi
 \end{itemize}
 Lo stato iniziale del \ac{TS} generato sarà lo stato che conterrà come label l'insieme $\{t_0 \dots t_n\}$, cioè quando tutti i filosofi sono nello stato di "thinking".
 
-Prendendo ad esempio il transition system per tre filosofi, si può verificare la starvation freedom con questa formula:
+Prendendo ad esempio il \ac{TS} per tre filosofi, si può verificare la starvation freedom con questa formula:
 $$ \forall \square \forall \lozenge e1 \& \forall \square \forall \lozenge e2 \& \forall \square \forall \lozenge e3$$
-cioè
-$$ \text{FA (FE e1) \& FA (FE e2) \& FA (FE e3)} $$.
-Il modelChecker restituisce \texttt{False} in quanto il deadlock può verificarsi nello stato \texttt{w1w2w3} in cui
-ciascuno dei filosofi tiene in mano una forchetta senza mai riuscire a prendere l'altra.
+Che, secondo la Grammatica~\ref{gra:ctls}, risulterà essere:
+$$ \text{FA (FE e1) \& FA (FE e2) \& FA (FE e3)} $$
+Il Model Checker restituisce \texttt{False} in quanto esiste uno stato in cui si può verificare un deadlock. Questo stato di deadlock ha come label \texttt{w1w2w3}, che corrisponde alla situazione in cui ciascuno dei filosofi tiene in mano una forchetta senza mai riuscire a prendere l'altra.
 
-Si può inoltre utilizzare il ts dei filosofi per esaminare l'uso del caching su una formula di grandi dimensioni.
-Prendendo ad esempio una formula che è formata da solo una concatenazione di tre $\forall \boldsymbol{Until}$:
-$$ \text{t1 FU h1 FU w1 FU e1}$$.
-Questa dopo la conversione in \ac{ENF} diventa:
-$$!(!(!(!(!(!(t1)UNTIL(!(h1)\&!(t1))) \& !([](!(t1))))UNTIL $$
-$$(!(w1)\&!(!(!(t1)UNTIL(!(h1)\&!(t1))) \& !([](!(t1)))))) $$
-$$ \& !([](!(!(!(t1)UNTIL(!(h1)\&!(t1))) \& !([](!(t1)))))))$$
-$$UNTIL(!(e1)\&!(!(!(!(!(t1)UNTIL(!(h1)\&!(t1))) $$
-$$ \& !([](!(t1))))UNTIL(!(w1)\&!(!(!(t1)UNTIL(!(h1)\&!(t1))) $$
-$$\& !([](!(t1)))))) \& !([](!(!(!(t1)UNTIL(!(h1)\&!(t1))) $$
-$$ \& !([](!(t1))))))))) \& !([](!(!(!(!(!(t1)UNTIL(!(h1)\&!(t1))) $$
-$$\& !([](!(t1))))UNTIL(!(w1)\&!(!(!(t1)UNTIL(!(h1)\&!(t1))) $$
-$$ \& !([](!(t1)))))) \& !([](!(!(!(t1)UNTIL(!(h1)\&!(t1))) \& !([](!(t1)))))))))$$
-
-Il modelChecker standard impiega 15 secondi per verificare la formula sul ts di cinque filosofi(), la versione con il caching ne utilizza solo 5.
-
-
-
-
-
+Si può inoltre utilizzare il \ac{TS} dei filosofi per esaminare l'uso del caching, mostrato in Sezione~\ref{sub:cachingmc}, su una formula di grandi dimensioni.
+Una formula di grandi dimensioni può essere una proposizione composta da tre $\forall \boldsymbol{U}$ annidati che dovrà successivamente essere convertita in \ac{ENF}.
+Ad esempio la:
+$$ \text{t1 FU h1 FU w1 FU e1}$$
+Convertita in \ac{ENF} diventa così:
+\begin{equation}\label{eq:form3}
+\begin{gathered}
+!(!(!(!(!(!(t1)UNTIL(!(h1)\&!(t1))) \& !([](!(t1))))UNTIL \\
+(!(w1)\&!(!(!(t1)UNTIL(!(h1)\&!(t1))) \& !([](!(t1)))))) \\
+ \& !([](!(!(!(t1)UNTIL(!(h1)\&!(t1))) \& !([](!(t1)))))))\\
+UNTIL(!(e1)\&!(!(!(!(!(t1)UNTIL(!(h1)\&!(t1))) \\
+ \& !([](!(t1))))UNTIL(!(w1)\&!(!(!(t1)UNTIL(!(h1)\&!(t1))) \\
+\& !([](!(t1)))))) \& !([](!(!(!(t1)UNTIL(!(h1)\&!(t1))) \\
+ \& !([](!(t1))))))))) \& !([](!(!(!(!(!(t1)UNTIL(!(h1)\&!(t1))) \\
+\& !([](!(t1))))UNTIL(!(w1)\&!(!(!(t1)UNTIL(!(h1)\&!(t1))) \\
+ \& !([](!(t1)))))) \& !([](!(!(!(t1)UNTIL(!(h1)\&!(t1))) \& !([](!(t1)))))))))\\
+\end{gathered}
+\end{equation}
+Per valutare la Formula \eqref{eq:form3} sul \ac{TS} che modella il problema dei cinque filosofi a cena si riscontrano notevoli miglioramenti tra il Model Checker standard e la versione ottimizzata. Il primo utilizza circa quindici secondi per valutare la formula, mentre il secondo ci impiega circa cinque secondi.
 
 
 
-
-%sistemare gli acronimi in una sezione
 \section*{Lista di acronimi}
 \begin{acronym}
 \acro{CTL}{Computational Tree Logic}
@@ -563,5 +568,6 @@ Il modelChecker standard impiega 15 secondi per verificare la formula sul ts di 
 \acro{XML}{eXtensible Markup Language}
 \acro{GEXF}{Graph Exchange \ac{XML} Format}
 \end{acronym}
-
+\bibliographystyle{plain}{}
+\bibliography{Relazione.bib}
 \end{document}
